@@ -7,27 +7,27 @@ namespace LibraryManagementSystem.Models.ValueObject
 {
     public class Administrator : ValueObject<Administrator>
     {
-        public Administrator(string admin_Id, string admin_Name, string admin_Password)
+        public Administrator(string adminId, string adminName, string adminPassword)
         {
-            Admin_Id = admin_Id;
-            Admin_Name = admin_Name;
-            Admin_Password = admin_Password;
+            AdminId = adminId;
+            AdminName = adminName;
+            AdminPassword = adminPassword;
         }
 
         /// <summary>
         /// 管理员帐号
         /// </summary>
-        public string Admin_Id { get; }
+        public string AdminId { get; }
 
         /// <summary>
         /// 管理员姓名
         /// </summary>
-        public string Admin_Name { get; }
+        public string AdminName { get; }
 
         /// <summary>
         /// 管理员密码
         /// </summary>
-        public string Admin_Password { get; }
+        public string AdminPassword { get; }
 
         protected override bool EqualsCore(Administrator other)
         {
