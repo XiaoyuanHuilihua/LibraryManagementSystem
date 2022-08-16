@@ -36,27 +36,27 @@ namespace LibraryManagementSystem.Models.ValueObject
         /// <summary>
         /// 读者帐号
         /// </summary>
-        public string ReaderId { get; }
+        public string ReaderId { get; set; }
 
         /// <summary>
         /// 读者名
         /// </summary>
-        public string ReaderName { get; }
+        public string ReaderName { get; set; }
 
         /// <summary>
         /// 读者密码
         /// </summary>
-        public string Password { get; }
+        public string Password { get; set; }
 
         /// <summary>
         /// 读者电话号码
         /// </summary>
-        public long PhoneNumber { get; }
+        public long PhoneNumber { get; set; }
 
         /// <summary>
         /// 读者身份证号
         /// </summary>
-        public string ReaderIdCard { get; }
+        public string ReaderIdCard { get; set; }
 
         protected override bool EqualsCore(Reader other)
         {
