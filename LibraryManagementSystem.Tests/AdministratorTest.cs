@@ -78,5 +78,15 @@ namespace LibraryManagementSystem.Tests
             Assert.AreEqual(13750991571, readerValueObject5.PhoneNumber);
             Assert.AreEqual("710100198712130000", readerValueObject5.ReaderIdCard);
         }
+
+        /// <summary>
+        /// 是否正确修改读者信息的测试
+        /// </summary>
+        [TestMethod]
+        [Ignore]
+        public void 查看读者借阅信息()
+        {
+            //TODO:现在还不会写这测试，实现“借书受理功能”之后才能设计
+        }
     }
 }

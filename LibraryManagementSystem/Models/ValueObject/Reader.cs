@@ -58,6 +58,7 @@ namespace LibraryManagementSystem.Models.ValueObject
         /// </summary>
         public string ReaderIdCard { get; set; }
 
+        /// <inheritdoc/>
         protected override bool EqualsCore(Reader other)
         {
             throw new NotImplementedException();
