@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using static LibraryManagementSystem.Models.ValueObject.ReaderCuurrentBorrowing;
 
 namespace LibraryManagementSystem.Models.UserManagementModules
 {
@@ -25,6 +26,9 @@ namespace LibraryManagementSystem.Models.UserManagementModules
             ReaderIdCard,
         }
 
+        /// <summary>
+        /// 构造函数
+        /// </summary>
         public AdministratorModule()
         {
             //处理
@@ -35,7 +39,7 @@ namespace LibraryManagementSystem.Models.UserManagementModules
         /// </summary>
         /// <param name="ReaderInfoKind">标识的分类</param>
         /// <param name="keyword">搜索词</param>
-        /// <returns></returns>
+        /// <returns>读者信息（List型）</returns>
         public List<Reader> SearchReaderInfo(ReaderInfoKind ReaderInfoKind, dynamic keyword)
         {
             DataRowCollection rows;
@@ -62,10 +66,10 @@ namespace LibraryManagementSystem.Models.UserManagementModules
                     break;
             }
 
-            //SQL文の検索結果がなかった時
+            //当SQL文的搜索结果为0时
             if (rows.Count == 0)
             {
-                throw new Exception("検索結果は0でした。");
+                throw new Exception("搜索结果为0。");
             }
 
             var lists = new List<Reader>();
@@ -112,6 +116,31 @@ namespace LibraryManagementSystem.Models.UserManagementModules
                     throw new Exception();
                     break;
             }
+        }
+
+        /// <summary>
+        /// 查看读者当前借阅功能
+        /// </summary>
+        /// <param name="readerId">读者帐号</param>
+        /// <returns>读者的当前借阅信息（List型）</returns>
+        public List<ReaderCuurrentBorrowing> SearchReadersCurrentBorrowing(string readerId)
+        {
+            DataRowCollection rows = Sql.Read("SELECT BORROW.READER_ID, BORROW.BOOK_ID, BOOK.BOOK_NAME, BORROW.BORROW_DATE, BORROW.LATEST_RETURN_DATE, BORROW.CONTINUED_STATE FROM BORROW, BOOK WHERE BORROW.BOOK_ID = BOOK.BOOK_ID AND(BORROW.READER_ID = '@0')", readerId);
+
+            //当SQL文的搜索结果为0时
+            if (rows.Count == 0)
+            {
+                throw new Exception("搜索结果为0。");
+            }
+
+            var lists = new List<ReaderCuurrentBorrowing>();
+
+            for (int i = 0; i < rows.Count; i++)
+            {
+                lists.Add(new ReaderCuurrentBorrowing(rows[i]["BORROW.READER_ID"].ToString(), rows[i]["BORROW.BOOK_ID"].ToString(), rows[i]["BOOK.BOOK_NAME"].ToString(), (DateTime)rows[i]["BORROW.BORROW_DATED"], (DateTime)rows[i]["BORROW.LATEST_RETURN_DAT"], (ContinuedStates)rows[i]["BORROW.CONTINUED_STATE"]));
+            }
+
+            return lists;
         }
     }
 }

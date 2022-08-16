@@ -29,6 +29,7 @@ namespace LibraryManagementSystem.Models.ValueObject
         /// </summary>
         public string AdminPassword { get; }
 
+        /// <inheritdoc/>
         protected override bool EqualsCore(Administrator other)
         {
             throw new NotImplementedException();
