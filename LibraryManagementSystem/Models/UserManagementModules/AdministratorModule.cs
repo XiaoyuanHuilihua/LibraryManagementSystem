@@ -16,10 +16,11 @@ namespace LibraryManagementSystem.Models.UserManagementModules
         /// <summary>
         /// 当使用查看功能时，识别分类
         /// </summary>
-        public enum SearchKind
+        public enum ReaderInfoKind
         {
             ReaderId,
             ReaderName,
+            Password,
             PhoneNumber,
             ReaderIdCard,
         }
@@ -30,29 +31,29 @@ namespace LibraryManagementSystem.Models.UserManagementModules
         }
 
         /// <summary>
-        ///
+        ///搜索帐户功能
         /// </summary>
-        /// <param name="searchKind">标识的分类</param>
+        /// <param name="ReaderInfoKind">标识的分类</param>
         /// <param name="keyword">搜索词</param>
         /// <returns></returns>
-        public List<Reader> SearchReaderInfo(SearchKind searchKind, dynamic keyword)
+        public List<Reader> SearchReaderInfo(ReaderInfoKind ReaderInfoKind, dynamic keyword)
         {
             DataRowCollection rows;
-            switch (searchKind)
+            switch (ReaderInfoKind)
             {
-                case SearchKind.ReaderId:
-                    rows = Sql.Read("SELECT * FROM reader WHERE(READER_ID = '@0') ", (int)keyword);
+                case ReaderInfoKind.ReaderId:
+                    rows = Sql.Read("SELECT * FROM reader WHERE(READER_ID = '@0') ", keyword);
                     break;
 
-                case SearchKind.ReaderName:
+                case ReaderInfoKind.ReaderName:
                     rows = Sql.Read("SELECT * FROM reader WHERE reader_name like '%@0%'", keyword);
                     break;
 
-                case SearchKind.PhoneNumber:
+                case ReaderInfoKind.PhoneNumber:
                     rows = Sql.Read("SELECT * FROM reader WHERE phone_number = @0", keyword);
                     break;
 
-                case SearchKind.ReaderIdCard:
+                case ReaderInfoKind.ReaderIdCard:
                     rows = Sql.Read("SELECT * FROM reader WHERE eader_idcard = @0", keyword);
                     break;
 
@@ -75,6 +76,42 @@ namespace LibraryManagementSystem.Models.UserManagementModules
             }
 
             return lists;
+        }
+
+        /// <summary>
+        /// 编辑帐户信息功能
+        /// </summary>
+        /// <param name="reader">相应的读者的ValueObject</param>
+        /// <param name="infoKind">要修改的信息标识</param>
+        /// <param name="updated">修改后的内容</param>
+        public void UpdateReaderInfo(Reader reader, ReaderInfoKind infoKind, Object updated)
+        {
+            switch (infoKind)
+            {
+                case (ReaderInfoKind.ReaderId):
+                    reader.ReaderId = (string)updated;
+                    break;
+
+                case (ReaderInfoKind.ReaderName):
+                    reader.ReaderName = (string)updated;
+                    break;
+
+                case (ReaderInfoKind.Password):
+                    reader.Password = (string)updated;
+                    break;
+
+                case (ReaderInfoKind.PhoneNumber):
+                    reader.PhoneNumber = (long)updated;
+                    break;
+
+                case (ReaderInfoKind.ReaderIdCard):
+                    reader.ReaderIdCard = (string)updated;
+                    break;
+
+                default:
+                    throw new Exception();
+                    break;
+            }
         }
     }
 }
