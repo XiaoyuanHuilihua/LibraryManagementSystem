@@ -38,6 +38,24 @@ namespace LibraryManagementSystem.Models.ValueObject
             string author,
             string publisher,
             DateTime publishDate,
+            string bookDetail)
+        {
+            BookId = bookId;
+            ISBN = isbn;
+            BookName = bookName;
+            Author = author;
+            Publisher = publisher;
+            PublishDate = publishDate;
+            BookDetail = bookDetail;
+        }
+
+        public Book(
+            string bookId,
+            string isbn,
+            string bookName,
+            string author,
+            string publisher,
+            DateTime publishDate,
             string bookDetail,
             string pictureList,
             int price)
