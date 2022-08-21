@@ -20,8 +20,28 @@ namespace LibraryManagementSystem.Models.ManagementBooksModules
             int bookId = Sql.Read("SELECT * FROM BOOK").Count + 1;
 
             //TODO:要删除quantity属性
-            var book = new Book(bookId.ToString(), isbn, bookName, author, publisher, publishDate, bookDetail, pictureList, price);
-            Sql.Execute($"INSERT INTO BOOK (BOOK_ID, ISBN, BOOK_NAME, AUTHOR, PUBLISHER, PUBLISH_DATE, BOOK_DETAIL, PRICE) VALUES('{book.BookId}','{book.ISBN}','{book.BookName}','{book.Author}','{book.Publisher}','{book.PublishDate.ToString("yyyy/MM/dd")}','{book.BookDetail}',{book.Price})");
+            var book = new Book(
+                bookId.ToString(),
+                isbn,
+                bookName,
+                author,
+                publisher,
+                publishDate,
+                bookDetail,
+                pictureList,
+                price);
+
+            Sql.Execute(
+                $"INSERT INTO BOOK " +
+                $"(BOOK_ID, ISBN, BOOK_NAME, AUTHOR, PUBLISHER, PUBLISH_DATE, BOOK_DETAIL, PRICE) " +
+                $"VALUES('{book.BookId}'," +
+                $"'{book.ISBN}'," +
+                $"'{book.BookName}'," +
+                $"'{book.Author}'," +
+                $"'{book.Publisher}'," +
+                $"'{book.PublishDate.ToString("yyyy/MM/dd")}'," +
+                $"'{book.BookDetail}'," +
+                $"{book.Price})");
         }
     }
 }

@@ -12,17 +12,34 @@ namespace LibraryManagementSystem.Tests
     [TestClass]
     public class ManagementBooksModuleTest
     {
-        private readonly ManagementBooksModule _managementBooksModule = new ManagementBooksModule();
+        private readonly ManagementBooksModule _managementBooksModule =
+            new ManagementBooksModule();
 
         [TestMethod]
         public void 图书录入功能()
         {
-            _managementBooksModule.ResisterBook("TestBookBookBook", "TestISBN1234567890", "TestAuthor", "TestPublisher", DateTime.Parse("2022/01/01"), "TestBookDetail", 100);
+            _managementBooksModule.ResisterBook(
+                "TestBookBookBook",
+                "TestISBN1234567890",
+                "TestAuthor",
+                "TestPublisher",
+                DateTime.Parse("2022/01/01"),
+                "TestBookDetail",
+                100);
 
-            DataRowCollection dataCollection = Sql.Read("SELECT BOOK_ID FROM BOOK WHERE(ISBN = 'TestISBN1234567890')");
+            DataRowCollection dataCollection =
+                Sql.Read(
+                    "SELECT BOOK_ID " +
+                    "FROM BOOK " +
+                    "WHERE(ISBN = 'TestISBN1234567890')");
+
             string bookId = Convert.ToString(dataCollection[0]["BOOK_ID"]);
 
-            DataRowCollection testDataRowCollection = Sql.Read("SELECT BOOK_ID, ISBN, BOOK_NAME, AUTHOR, PUBLISHER, PUBLISH_DATE, BOOK_DETAIL, PRICE FROM BOOK WHERE(ISBN = 'TestISBN1234567890')");
+            DataRowCollection testDataRowCollection =
+                Sql.Read(
+                    "SELECT BOOK_ID, ISBN, BOOK_NAME, AUTHOR, PUBLISHER, PUBLISH_DATE, BOOK_DETAIL, PRICE " +
+                    "FROM BOOK " +
+                    "WHERE(ISBN = 'TestISBN1234567890')");
 
             if (testDataRowCollection.Count > 0)
             {
@@ -49,7 +66,9 @@ namespace LibraryManagementSystem.Tests
                 throw new Exception();
             }
 
-            Sql.Execute($"DELETE FROM BOOK WHERE BOOK_ID = {bookId}");
+            Sql.Execute(
+                $"DELETE FROM BOOK " +
+                $"WHERE BOOK_ID = {bookId}");
         }
     }
 }

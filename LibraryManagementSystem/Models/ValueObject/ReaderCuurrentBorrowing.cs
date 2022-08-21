@@ -15,6 +15,7 @@ namespace LibraryManagementSystem.Models.ValueObject
         /// </summary>
         public enum ContinuedStates
         {
+            unknown = 0,
             yet,
             already,
         }
@@ -22,7 +23,13 @@ namespace LibraryManagementSystem.Models.ValueObject
         /// <summary>
         /// 构造函数
         /// </summary>
-        public ReaderCuurrentBorrowing(string readerId, string bookId, string bookName, DateTime borrowDate, DateTime latestReturnDate, ContinuedStates continuedState)
+        public ReaderCuurrentBorrowing(
+            string readerId,
+            string bookId,
+            string bookName,
+            DateTime borrowDate,
+            DateTime latestReturnDate,
+            ContinuedStates continuedState)
         {
             ReaderId = readerId;
             BookId = bookId;

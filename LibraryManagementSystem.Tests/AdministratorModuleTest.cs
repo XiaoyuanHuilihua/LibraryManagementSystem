@@ -1,6 +1,7 @@
 ﻿using LibraryManagementSystem.Models.UserManagementModules;
 using LibraryManagementSystem.Models.ValueObject;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 
 namespace LibraryManagementSystem.Tests
 {
@@ -13,18 +14,69 @@ namespace LibraryManagementSystem.Tests
         private readonly AdministratorModule _administratorModule = new AdministratorModule();
 
         /// <summary>
-        /// 以读者Id搜索读者信息的测试
+        /// 以选择的信息搜索读者信息的测试
         /// </summary>
         [TestMethod]
-        public void 以读者Id搜索读者信息的测试()
+        public void 以选择的信息搜索读者信息的测试()
         {
-            //テスト用
-            var readerValueObject = new Reader("10", "Jackey Chen", "c123456", 13750991571, "710100198712134422");
-            Assert.AreEqual("10", readerValueObject.ReaderId);
-            Assert.AreEqual("Jackey Chen", readerValueObject.ReaderName);
-            Assert.AreEqual("c123456", readerValueObject.Password);
-            Assert.AreEqual(13750991571, readerValueObject.PhoneNumber);
-            Assert.AreEqual("710100198712134422", readerValueObject.ReaderIdCard);
+            var actuals = _administratorModule.SearchReaderInfo(AdministratorModule.ReaderInfoKind.ReaderId, "10");
+            if (actuals.Count < 0)
+            {
+                throw new Exception();
+            }
+            foreach (var actual in actuals)
+            {
+                Assert.AreEqual("10", actual.ReaderId);
+                Assert.AreEqual("Jackey Chen", actual.ReaderName);
+                Assert.AreEqual("c123456", actual.Password);
+                Assert.AreEqual(13750991571, actual.PhoneNumber);
+                Assert.AreEqual("710100198712134422", actual.ReaderIdCard);
+            }
+            actuals.Clear();
+
+            actuals = _administratorModule.SearchReaderInfo(AdministratorModule.ReaderInfoKind.ReaderName, "Jackey Chen");
+            if (actuals.Count < 0)
+            {
+                throw new Exception();
+            }
+            foreach (var actual in actuals)
+            {
+                Assert.AreEqual("10", actual.ReaderId);
+                Assert.AreEqual("Jackey Chen", actual.ReaderName);
+                Assert.AreEqual("c123456", actual.Password);
+                Assert.AreEqual(13750991571, actual.PhoneNumber);
+                Assert.AreEqual("710100198712134422", actual.ReaderIdCard);
+            }
+            actuals.Clear();
+
+            actuals = _administratorModule.SearchReaderInfo(AdministratorModule.ReaderInfoKind.PhoneNumber, "13750991571");
+            if (actuals.Count < 0)
+            {
+                throw new Exception();
+            }
+            foreach (var actual in actuals)
+            {
+                Assert.AreEqual("10", actual.ReaderId);
+                Assert.AreEqual("Jackey Chen", actual.ReaderName);
+                Assert.AreEqual("c123456", actual.Password);
+                Assert.AreEqual(13750991571, actual.PhoneNumber);
+                Assert.AreEqual("710100198712134422", actual.ReaderIdCard);
+            }
+            actuals.Clear();
+
+            actuals = _administratorModule.SearchReaderInfo(AdministratorModule.ReaderInfoKind.ReaderIdCard, "710100198712134422");
+            if (actuals.Count < 0)
+            {
+                throw new Exception();
+            }
+            foreach (var actual in actuals)
+            {
+                Assert.AreEqual("10", actual.ReaderId);
+                Assert.AreEqual("Jackey Chen", actual.ReaderName);
+                Assert.AreEqual("c123456", actual.Password);
+                Assert.AreEqual(13750991571, actual.PhoneNumber);
+                Assert.AreEqual("710100198712134422", actual.ReaderIdCard);
+            }
         }
 
         /// <summary>

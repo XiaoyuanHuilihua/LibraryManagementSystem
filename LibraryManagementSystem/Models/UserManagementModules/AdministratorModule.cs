@@ -46,19 +46,28 @@ namespace LibraryManagementSystem.Models.UserManagementModules
             switch (ReaderInfoKind)
             {
                 case ReaderInfoKind.ReaderId:
-                    rows = Sql.Read("SELECT * FROM reader WHERE(READER_ID = '@0') ", keyword);
+                    rows = Sql.Read(
+                        $"SELECT * " +
+                        $"FROM READER " +
+                        $"WHERE(READER_ID = '{keyword}') ");
                     break;
 
                 case ReaderInfoKind.ReaderName:
-                    rows = Sql.Read("SELECT * FROM reader WHERE reader_name like '%@0%'", keyword);
+                    rows = Sql.Read($"SELECT * " +
+                        $"FROM READER " +
+                        $"WHERE READER_NAME like '%{keyword}%'");
                     break;
 
                 case ReaderInfoKind.PhoneNumber:
-                    rows = Sql.Read("SELECT * FROM reader WHERE phone_number = @0", keyword);
+                    rows = Sql.Read($"SELECT * " +
+                        $"FROM READER " +
+                        $"WHERE PHONE_NUMBER = {keyword}");
                     break;
 
                 case ReaderInfoKind.ReaderIdCard:
-                    rows = Sql.Read("SELECT * FROM reader WHERE eader_idcard = @0", keyword);
+                    rows = Sql.Read($"SELECT * " +
+                        $"FROM READER " +
+                        $"WHERE READER_IDCARD = '{keyword}'");
                     break;
 
                 default:
@@ -76,7 +85,13 @@ namespace LibraryManagementSystem.Models.UserManagementModules
 
             for (int i = 0; i < rows.Count; i++)
             {
-                lists.Add(new Reader(rows[i]["reader_id"].ToString(), rows[i]["reader_name"].ToString(), rows[i]["reader_password"].ToString(), (uint)rows[i]["phone_number"], rows[i]["reader_idcard"].ToString()));
+                lists.Add(new Reader(
+                    Convert.ToString(rows[i]["READER_ID"]),
+                    Convert.ToString(rows[i]["READER_NAME"]),
+                    Convert.ToString(rows[i]["READER_PASSWORD"]),
+                    (long)Convert.ToInt64(rows[i]["PHONE_NUMBER"]),
+                    Convert.ToString(rows[i]["READER_IDCARD"])
+                    ));
             }
 
             return lists;
@@ -125,7 +140,14 @@ namespace LibraryManagementSystem.Models.UserManagementModules
         /// <returns>读者的当前借阅信息（List型）</returns>
         public List<ReaderCuurrentBorrowing> SearchReadersCurrentBorrowing(string readerId)
         {
-            DataRowCollection rows = Sql.Read("SELECT BORROW.READER_ID, BORROW.BOOK_ID, BOOK.BOOK_NAME, BORROW.BORROW_DATE, BORROW.LATEST_RETURN_DATE, BORROW.CONTINUED_STATE FROM BORROW, BOOK WHERE BORROW.BOOK_ID = BOOK.BOOK_ID AND(BORROW.READER_ID = '@0')", readerId);
+            DataRowCollection rows = Sql.Read(
+                $"SELECT BORROW.READER_ID," +
+                $" BORROW.BOOK_ID, BOOK.BOOK_NAME," +
+                $" BORROW.BORROW_DATE, BORROW.LATEST_RETURN_DATE," +
+                $" BORROW.CONTINUED_STATE" +
+                $" FROM BORROW, BOOK " +
+                $"WHERE BORROW.BOOK_ID = BOOK.BOOK_ID " +
+                $"AND(BORROW.READER_ID = '{readerId}')");
 
             //当SQL文的搜索结果为0时
             if (rows.Count == 0)
@@ -137,7 +159,26 @@ namespace LibraryManagementSystem.Models.UserManagementModules
 
             for (int i = 0; i < rows.Count; i++)
             {
-                lists.Add(new ReaderCuurrentBorrowing(rows[i]["BORROW.READER_ID"].ToString(), rows[i]["BORROW.BOOK_ID"].ToString(), rows[i]["BOOK.BOOK_NAME"].ToString(), (DateTime)rows[i]["BORROW.BORROW_DATED"], (DateTime)rows[i]["BORROW.LATEST_RETURN_DAT"], (ContinuedStates)rows[i]["BORROW.CONTINUED_STATE"]));
+                //判断续借状态
+                string identifyContinuedState = Convert.ToString(rows[i]["BORROW.CONTINUED_STATE"]);
+                ContinuedStates continuedState = ContinuedStates.unknown;
+                if (identifyContinuedState == "yet")
+                {
+                    continuedState = ContinuedStates.yet;
+                }
+                else if (identifyContinuedState == "already")
+                {
+                    continuedState = ContinuedStates.already;
+                }
+
+                lists.Add(
+                    new ReaderCuurrentBorrowing(
+                        Convert.ToString(rows[i]["BORROW.READER_ID"]),
+                        Convert.ToString(rows[i]["BORROW.BOOK_ID"]),
+                        Convert.ToString(rows[i]["BOOK.BOOK_NAME"]),
+                        (DateTime)rows[i]["BORROW.BORROW_DATED"],
+                        (DateTime)rows[i]["BORROW.LATEST_RETURN_DAT"],
+                        continuedState));
             }
 
             return lists;
