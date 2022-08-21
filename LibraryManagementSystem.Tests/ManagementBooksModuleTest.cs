@@ -3,6 +3,7 @@ using LibraryManagementSystem.Models.ManagementBooksModules;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Data;
+using static LibraryManagementSystem.Models.ManagementBooksModules.ManagementBooksModule;
 
 namespace LibraryManagementSystem.Tests
 {
@@ -15,8 +16,11 @@ namespace LibraryManagementSystem.Tests
         private readonly ManagementBooksModule _managementBooksModule =
             new ManagementBooksModule();
 
+        /// <summary>
+        /// 图书录入功能测试
+        /// </summary>
         [TestMethod]
-        public void 图书录入功能()
+        public void 图书录入功能测试()
         {
             _managementBooksModule.ResisterBook(
                 "TestBookBookBook",
@@ -69,6 +73,103 @@ namespace LibraryManagementSystem.Tests
             Sql.Execute(
                 $"DELETE FROM BOOK " +
                 $"WHERE BOOK_ID = {bookId}");
+        }
+
+        /// <summary>
+        ///图书检索功能测试
+        /// </summary>
+        [TestMethod]
+        public void 图书检索功能测试()
+        {
+            var actuals = _managementBooksModule.SearchBookInfo(BookInfoKind.BookId, "3");
+            if (actuals.Count < 0)
+            {
+                throw new Exception();
+            }
+
+            foreach (var actual in actuals)
+            {
+                Assert.AreEqual("3", actual.BookId);
+                Assert.AreEqual("978-1540528247", actual.ISBN);
+                Assert.AreEqual("Hard Times", actual.BookName);
+                Assert.AreEqual("Charles Dickens", actual.Author);
+                Assert.AreEqual("CreateSpace", actual.Publisher);
+                Assert.AreEqual(DateTime.Parse("2016/11/20"), actual.PublishDate);
+                Assert.AreEqual("Hard Times Charles Dickens Hard Times ？ For These Times (commonly known as Hard Times) is the tenth novel by Charles Dickens, first published in 1854. The book appraises English society and highlights the social and economic pressures of the times. The novel was published as a serial in Dickens's weekly publication, Household Words. Sales were highly responsive and encouraging for Dickens who remarked that he was \"Three parts mad, and the fourth delirious, with perpetual rushing at Hard Times\". The novel was serialised, in twenty weekly parts, between 1 April and 12 August 1854. It sold well, and a complete volume was published in August, totalling 110,000 words. Another related novel, North and South by Elizabeth Gaskell, was also published in this magazine.", actual.BookDetail);
+            }
+            actuals.Clear();
+
+            actuals = _managementBooksModule.SearchBookInfo(BookInfoKind.ISBN, "978-1540528247");
+            if (actuals.Count < 0)
+            {
+                throw new Exception();
+            }
+
+            foreach (var actual in actuals)
+            {
+                Assert.AreEqual("3", actual.BookId);
+                Assert.AreEqual("978-1540528247", actual.ISBN);
+                Assert.AreEqual("Hard Times", actual.BookName);
+                Assert.AreEqual("Charles Dickens", actual.Author);
+                Assert.AreEqual("CreateSpace", actual.Publisher);
+                Assert.AreEqual(DateTime.Parse("2016/11/20"), actual.PublishDate);
+                Assert.AreEqual("Hard Times Charles Dickens Hard Times ？ For These Times (commonly known as Hard Times) is the tenth novel by Charles Dickens, first published in 1854. The book appraises English society and highlights the social and economic pressures of the times. The novel was published as a serial in Dickens's weekly publication, Household Words. Sales were highly responsive and encouraging for Dickens who remarked that he was \"Three parts mad, and the fourth delirious, with perpetual rushing at Hard Times\". The novel was serialised, in twenty weekly parts, between 1 April and 12 August 1854. It sold well, and a complete volume was published in August, totalling 110,000 words. Another related novel, North and South by Elizabeth Gaskell, was also published in this magazine.", actual.BookDetail);
+            }
+            actuals.Clear();
+
+            actuals = _managementBooksModule.SearchBookInfo(BookInfoKind.BookName, "Hard Times");
+            if (actuals.Count < 0)
+            {
+                throw new Exception();
+            }
+
+            foreach (var actual in actuals)
+            {
+                Assert.AreEqual("3", actual.BookId);
+                Assert.AreEqual("978-1540528247", actual.ISBN);
+                Assert.AreEqual("Hard Times", actual.BookName);
+                Assert.AreEqual("Charles Dickens", actual.Author);
+                Assert.AreEqual("CreateSpace", actual.Publisher);
+                Assert.AreEqual(DateTime.Parse("2016/11/20"), actual.PublishDate);
+                Assert.AreEqual("Hard Times Charles Dickens Hard Times ？ For These Times (commonly known as Hard Times) is the tenth novel by Charles Dickens, first published in 1854. The book appraises English society and highlights the social and economic pressures of the times. The novel was published as a serial in Dickens's weekly publication, Household Words. Sales were highly responsive and encouraging for Dickens who remarked that he was \"Three parts mad, and the fourth delirious, with perpetual rushing at Hard Times\". The novel was serialised, in twenty weekly parts, between 1 April and 12 August 1854. It sold well, and a complete volume was published in August, totalling 110,000 words. Another related novel, North and South by Elizabeth Gaskell, was also published in this magazine.", actual.BookDetail);
+            }
+            actuals.Clear();
+
+            actuals = _managementBooksModule.SearchBookInfo(BookInfoKind.Author, "Charles Dickens");
+            if (actuals.Count < 0)
+            {
+                throw new Exception();
+            }
+
+            foreach (var actual in actuals)
+            {
+                Assert.AreEqual("3", actual.BookId);
+                Assert.AreEqual("978-1540528247", actual.ISBN);
+                Assert.AreEqual("Hard Times", actual.BookName);
+                Assert.AreEqual("Charles Dickens", actual.Author);
+                Assert.AreEqual("CreateSpace", actual.Publisher);
+                Assert.AreEqual(DateTime.Parse("2016/11/20"), actual.PublishDate);
+                Assert.AreEqual("Hard Times Charles Dickens Hard Times ？ For These Times (commonly known as Hard Times) is the tenth novel by Charles Dickens, first published in 1854. The book appraises English society and highlights the social and economic pressures of the times. The novel was published as a serial in Dickens's weekly publication, Household Words. Sales were highly responsive and encouraging for Dickens who remarked that he was \"Three parts mad, and the fourth delirious, with perpetual rushing at Hard Times\". The novel was serialised, in twenty weekly parts, between 1 April and 12 August 1854. It sold well, and a complete volume was published in August, totalling 110,000 words. Another related novel, North and South by Elizabeth Gaskell, was also published in this magazine.", actual.BookDetail);
+            }
+            actuals.Clear();
+
+            actuals = _managementBooksModule.SearchBookInfo(BookInfoKind.Publisher, "CreateSpace");
+            if (actuals.Count < 0)
+            {
+                throw new Exception();
+            }
+
+            foreach (var actual in actuals)
+            {
+                Assert.AreEqual("3", actual.BookId);
+                Assert.AreEqual("978-1540528247", actual.ISBN);
+                Assert.AreEqual("Hard Times", actual.BookName);
+                Assert.AreEqual("Charles Dickens", actual.Author);
+                Assert.AreEqual("CreateSpace", actual.Publisher);
+                Assert.AreEqual(DateTime.Parse("2016/11/20"), actual.PublishDate);
+                Assert.AreEqual("Hard Times Charles Dickens Hard Times ？ For These Times (commonly known as Hard Times) is the tenth novel by Charles Dickens, first published in 1854. The book appraises English society and highlights the social and economic pressures of the times. The novel was published as a serial in Dickens's weekly publication, Household Words. Sales were highly responsive and encouraging for Dickens who remarked that he was \"Three parts mad, and the fourth delirious, with perpetual rushing at Hard Times\". The novel was serialised, in twenty weekly parts, between 1 April and 12 August 1854. It sold well, and a complete volume was published in August, totalling 110,000 words. Another related novel, North and South by Elizabeth Gaskell, was also published in this magazine.", actual.BookDetail);
+            }
+            actuals.Clear();
         }
     }
 }
