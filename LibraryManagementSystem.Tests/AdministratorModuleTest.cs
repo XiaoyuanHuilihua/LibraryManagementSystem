@@ -5,10 +5,10 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace LibraryManagementSystem.Tests
 {
     /// <summary>
-    /// 测试Administrator类操作(函数)的测试类
+    /// 测试AdministratorModule类操作(函数)的测试类
     /// </summary>
     [TestClass]
-    public class AdministratorTest
+    public class AdministratorModuleTest
     {
         private readonly AdministratorModule _administratorModule = new AdministratorModule();
 
