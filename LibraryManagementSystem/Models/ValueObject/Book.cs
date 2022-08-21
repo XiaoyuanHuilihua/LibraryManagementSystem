@@ -31,7 +31,16 @@ namespace LibraryManagementSystem.Models.ValueObject
             reserved,
         }
 
-        public Book(string bookId, string isbn, string bookName, string author, string publisher, DateTime publishDate, string bookDetail, string pictureList, int price)
+        public Book(
+            string bookId,
+            string isbn,
+            string bookName,
+            string author,
+            string publisher,
+            DateTime publishDate,
+            string bookDetail,
+            string pictureList,
+            int price)
         {
             BookId = bookId;
             ISBN = isbn;
