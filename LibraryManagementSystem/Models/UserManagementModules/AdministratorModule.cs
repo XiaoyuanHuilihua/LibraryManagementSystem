@@ -161,15 +161,17 @@ namespace LibraryManagementSystem.Models.UserManagementModules
             {
                 //判断续借状态
                 string identifyContinuedState = Convert.ToString(rows[i]["BORROW.CONTINUED_STATE"]);
-                ContinuedStates continuedState = ContinuedStates.unknown;
-                if (identifyContinuedState == "yet")
-                {
-                    continuedState = ContinuedStates.yet;
-                }
-                else if (identifyContinuedState == "already")
-                {
-                    continuedState = ContinuedStates.already;
-                }
+                //ContinuedStates continuedState = ContinuedStates.unknown;
+                //if (identifyContinuedState == "yet")
+                //{
+                //    continuedState = ContinuedStates.yet;
+                //}
+                //else if (identifyContinuedState == "already")
+                //{
+                //    continuedState = ContinuedStates.already;
+                //}
+
+                ContinuedStates continuedState = EnumHelper.ToEnum<ContinuedStates>(identifyContinuedState);
 
                 lists.Add(
                     new ReaderCuurrentBorrowing(

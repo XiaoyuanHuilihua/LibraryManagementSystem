@@ -70,9 +70,9 @@ namespace LibraryManagementSystem.Tests
                 throw new Exception();
             }
 
-            Sql.Execute(
-                $"DELETE FROM BOOK " +
-                $"WHERE BOOK_ID = {bookId}");
+            //Sql.Execute(
+            //    $"DELETE FROM BOOK " +
+            //    $"WHERE BOOK_ID = {bookId}");
         }
 
         /// <summary>
