@@ -61,7 +61,7 @@ namespace LibraryManagementSystem.Models.ValueObject
         /// <inheritdoc/>
         protected override bool EqualsCore(Reader other)
         {
-            throw new NotImplementedException();
+            return true;
         }
     }
 }
