@@ -33,7 +33,6 @@ namespace LibraryManagementSystem.Models.ManagementBooksModules
                 publisher,
                 publishDate,
                 bookDetail,
-                pictureList,
                 price);
 
             Sql.Execute(
@@ -129,14 +128,11 @@ namespace LibraryManagementSystem.Models.ManagementBooksModules
         /// </summary>
         public void BookCancellation(dynamic bookId)
         {
-            //TODO:需要在注销表编辑（添加ISBN编号）
             DataRowCollection rows = Sql.Read(
                 $"SELECT BOOK_ID, ISBN, BOOK_NAME, AUTHOR, PUBLISHER, PUBLISH_DATE, LEND_RESERVE, BOOK_DETAIL, PICTURE_LIST, PRICE " +
                 $"FROM BOOK " +
                 $"WHERE(BOOK_ID = '{bookId}')");
-            //SELECT BOOK_ID, ISBN, BOOK_NAME, AUTHOR, PUBLISHER, PUBLISH_DATE, LEND_RESERVE, BOOK_DETAIL, PICTURE_LIST, PRICE
-            //FROM BOOK
-            //WHERE(BOOK_ID = 'TestId321')
+
             if (rows.Count == 0)
             {
                 throw new Exception("无数据");
@@ -147,6 +143,7 @@ namespace LibraryManagementSystem.Models.ManagementBooksModules
             }
 
             Sql.Execute($"DELETE FROM BOOK WHERE BOOK_ID = '{bookId}'");
+
 
             string cancelId = Convert.ToString(Sql.Read($"SELECT * FROM BOOKCANCEL").Count + 1);
             var bookCancelObj = new Bookcancel(bookId, cancelId, DateTime.Now, Convert.ToString(rows[0]["ISBN"]));
@@ -159,17 +156,6 @@ namespace LibraryManagementSystem.Models.ManagementBooksModules
                 $"'{bookCancelObj.CancelDate.ToString("yyyy/MM/dd")}'," +
                 $"'{bookCancelObj.ISBN}')");
 
-            //Sql.Execute(
-            //    $"INSERT INTO BOOK " +
-            //    $"(BOOK_ID, CANCEL_ID, CANCEL_DATE, ISBN) " +
-            //    $"VALUES('{bookCancelObj.BookId}'," +
-            //    $"'{book.ISBN}'," +
-            //    $"'{book.BookName}'," +
-            //    $"'{book.Author}'," +
-            //    $"'{book.Publisher}'," +
-            //    $"'{book.PublishDate.ToString("yyyy/MM/dd")}'," +
-            //    $"'{book.BookDetail}'," +
-            //    $"{book.Price})");
         }
     }
 }

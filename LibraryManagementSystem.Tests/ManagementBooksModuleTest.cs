@@ -62,7 +62,7 @@ namespace LibraryManagementSystem.Tests
             {
                 throw new Exception();
             }
-
+          
             Sql.Execute(
                 $"DELETE FROM BOOK " +
                 $"WHERE BOOK_ID = 'TestBookId123'");

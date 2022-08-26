@@ -57,7 +57,6 @@ namespace LibraryManagementSystem.Models.ValueObject
             string publisher,
             DateTime publishDate,
             string bookDetail,
-            string pictureList,
             int price)
         {
             BookId = bookId;
@@ -67,7 +66,6 @@ namespace LibraryManagementSystem.Models.ValueObject
             Publisher = publisher;
             PublishDate = publishDate;
             BookDetail = bookDetail;
-            PictureList = pictureList;
             Price = price;
         }
 
@@ -110,11 +108,6 @@ namespace LibraryManagementSystem.Models.ValueObject
         /// 图书详细
         /// </summary>
         public string BookDetail { get; }
-
-        /// <summary>
-        /// 图集
-        /// </summary>
-        public string PictureList { get; }
 
         /// <summary>
         /// 图书标价
