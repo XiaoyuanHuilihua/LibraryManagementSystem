@@ -23,13 +23,10 @@ namespace LibraryManagementSystem.Models.ManagementBooksModules
         /// <summary>
         /// 图书录入功能
         /// </summary>
-        public void ResisterBook(string bookName, string isbn, string author, string publisher, DateTime publishDate, string bookDetail, int price)
+        public void ResisterBook(string bookId, string bookName, string isbn, string author, string publisher, DateTime publishDate, string bookDetail, int price, string pictureList = null)
         {
-            //生成图书编号
-            int bookId = Sql.Read("SELECT * FROM BOOK").Count + 1;
-
             var book = new Book(
-                bookId.ToString(),
+                bookId,
                 isbn,
                 bookName,
                 author,
@@ -128,12 +125,14 @@ namespace LibraryManagementSystem.Models.ManagementBooksModules
 
         /// <summary>
         /// 图书注销功能
-        /// 约束:从数据库中取出来的数据允许只有一个，不接受0、或一个以上
         /// </summary>
-        public void BookCancellation(string bookId)
+        public void BookCancellation(dynamic bookId)
         {
-            //TODO:需要在注销表编辑（添加ISBN编号）
-            DataRowCollection rows = Sql.Read($"SELECT BOOK_ID,ISBN FROM BOOK WHERE BOOK_ID = {bookId}");
+            DataRowCollection rows = Sql.Read(
+                $"SELECT BOOK_ID, ISBN, BOOK_NAME, AUTHOR, PUBLISHER, PUBLISH_DATE, LEND_RESERVE, BOOK_DETAIL, PICTURE_LIST, PRICE " +
+                $"FROM BOOK " +
+                $"WHERE(BOOK_ID = '{bookId}')");
+
             if (rows.Count == 0)
             {
                 throw new Exception("无数据");
@@ -143,12 +142,20 @@ namespace LibraryManagementSystem.Models.ManagementBooksModules
                 throw new Exception("逻辑不对");
             }
 
-            Sql.Execute($"DELETE FROM BOOK WHERE BOOK_ID = {bookId}");
+            Sql.Execute($"DELETE FROM BOOK WHERE BOOK_ID = '{bookId}'");
+
 
             string cancelId = Convert.ToString(Sql.Read($"SELECT * FROM BOOKCANCEL").Count + 1);
             var bookCancelObj = new Bookcancel(bookId, cancelId, DateTime.Now, Convert.ToString(rows[0]["ISBN"]));
 
-            Sql.Execute($"INSERT INTO BOOKCANCEL (BOOK_ID, CANCEL_ID, CANCEL_DATE,ISBN) VALUES({bookCancelObj.ISBN},{bookCancelObj.CancelId},{bookCancelObj.CancelDate},{bookCancelObj})");
+            Sql.Execute(
+                $"INSERT INTO BOOKCANCEL " +
+                $"(BOOK_ID, CANCEL_ID, CANCEL_DATE, ISBN) " +
+                $"VALUES('{bookCancelObj.BookId}'," +
+                $"'{bookCancelObj.CancelId}'," +
+                $"'{bookCancelObj.CancelDate.ToString("yyyy/MM/dd")}'," +
+                $"'{bookCancelObj.ISBN}')");
+
         }
     }
 }
