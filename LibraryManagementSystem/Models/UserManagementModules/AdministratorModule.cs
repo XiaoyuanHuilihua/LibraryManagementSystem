@@ -185,5 +185,32 @@ namespace LibraryManagementSystem.Models.UserManagementModules
 
             return lists;
         }
+
+        /// <summary>
+        /// 发送通知功能
+        /// </summary>
+        public void ProcessReserveOverdue()
+        {
+            //管理员向读者发送通知在以下情景使用（1）座位预约过期（2）图书预约过期（4）图书借阅超期
+            //所需数据：	读者账号，读者姓名，通知内容
+        }
+
+        /// <summary>
+        /// 查看过期未还书的读者名单功能
+        /// </summary>
+        public void SearchTheListOfReadersWhoHaveNotReturnedBooks()
+        {
+            //管理员通过该功能可以查看所有过期未还图读者的名单列表
+            //所需数据：	读者账号，读者姓名，图书编号，图书名，借阅日期，最晚归还日期，续借状态
+        }
+
+        /// <summary>
+        /// 编辑座位功能
+        /// </summary>
+        public void EditSeatInfo()
+        {
+            //管理员通过该功能，编辑图书馆中的所有座位信息，包括添加，删除，修改等座位维护操作
+            //所需数据：	座位编号，座位位置，座位状态
+        }
     }
 }
