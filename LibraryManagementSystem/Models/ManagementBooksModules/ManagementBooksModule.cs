@@ -48,6 +48,12 @@ namespace LibraryManagementSystem.Models.ManagementBooksModules
                 $"{book.Price})");
         }
 
+        /// <summary>
+        /// 图书检索功能
+        /// </summary>
+        /// <param name="bookInfoKind">检索属性</param>
+        /// <param name="keyword">关键词</param>
+        /// <returns></returns>
         public List<Book> SearchBookInfo(BookInfoKind bookInfoKind, dynamic keyword)
         {
             DataRowCollection rows;
