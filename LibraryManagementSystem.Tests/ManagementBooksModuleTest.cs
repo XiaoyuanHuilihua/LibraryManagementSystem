@@ -62,7 +62,7 @@ namespace LibraryManagementSystem.Tests
             {
                 throw new Exception();
             }
-          
+
             Sql.Execute(
                 $"DELETE FROM BOOK " +
                 $"WHERE BOOK_ID = 'TestBookId123'");
@@ -240,6 +240,14 @@ namespace LibraryManagementSystem.Tests
             Sql.Execute(
                 $"DELETE FROM BOOKCANCEL " +
                 $"WHERE BOOK_ID = '987654321'");
+        }
+
+        /// <summary>
+        /// 预约超期处理功能测试
+        /// </summary>
+        [TestMethod]
+        public void 预约超期处理功能测试()
+        {
         }
     }
 }
