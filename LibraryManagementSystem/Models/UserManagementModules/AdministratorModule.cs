@@ -27,6 +27,16 @@ namespace LibraryManagementSystem.Models.UserManagementModules
         }
 
         /// <summary>
+        /// 座位预约状态
+        /// </summary>
+        public enum SeatState
+        {
+            EmptySeat = 0,
+            RESERVED = 1,
+            unavailable = 2,
+        }
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         public AdministratorModule()
@@ -161,15 +171,6 @@ namespace LibraryManagementSystem.Models.UserManagementModules
             {
                 //判断续借状态
                 string identifyContinuedState = Convert.ToString(rows[i]["BORROW.CONTINUED_STATE"]);
-                //ContinuedStates continuedState = ContinuedStates.unknown;
-                //if (identifyContinuedState == "yet")
-                //{
-                //    continuedState = ContinuedStates.yet;
-                //}
-                //else if (identifyContinuedState == "already")
-                //{
-                //    continuedState = ContinuedStates.already;
-                //}
 
                 ContinuedStates continuedState = EnumHelper.ToEnum<ContinuedStates>(identifyContinuedState);
 
@@ -184,6 +185,92 @@ namespace LibraryManagementSystem.Models.UserManagementModules
             }
 
             return lists;
+        }
+
+        /// <summary>
+        /// 查看读者借阅历史功能
+        /// </summary>
+        public DataRowCollection SearchBorrowedHistory(string readerId)
+        {
+            //TODO:修改SQL语句的表名称
+            DataRowCollection rows = Sql.Read(
+                $"SELECT BORROW.READER_ID," +
+                $" BORROW.BOOK_ID, BOOK.BOOK_NAME," +
+                $" BORROW.BORROW_DATE, BORROW.LATEST_RETURN_DATE," +
+                $" BORROW.CONTINUED_STATE" +
+                $" FROM BORROW, BOOK " +
+                $"WHERE BORROW.BOOK_ID = BOOK.BOOK_ID " +
+                $"AND(BORROW.READER_ID = '{readerId}')");
+
+            //当SQL文的搜索结果为0时
+            if (rows.Count == 0)
+            {
+                throw new Exception("搜索结果为0。");
+            }
+
+            //这是随便的值
+            return rows;
+        }
+
+        /// <summary>
+        /// 发送通知功能
+        /// </summary>
+        public void SendMessage(string messageId, string readerId, string message)
+        {
+            Sql.Execute(
+                    $"INSERT INTO MESSAGE " +
+                    $"(READER_ID, MESSAGE, MESSAGE_TIME, MESSAGE_ID) " +
+                    $"VALUES('{readerId}'," +
+                    $"'{readerId}'," +
+                    $"'{Convert.ToDateTime(DateTime.Now).ToString("yyyy/MM/dd")}'," +
+                    $"'{messageId}')");
+        }
+
+        /// <summary>
+        /// 查看过期未还书的读者名单功能
+        /// </summary>
+        public DataRowCollection SearchTheListOfReadersWhoHaveNotReturnedBooks()
+        {
+            //管理员通过该功能可以查看所有过期未还图读者的名单列表
+            //所需数据：	读者账号，读者姓名，图书编号，图书名，借阅日期，最晚归还日期，续借状态
+            DataRowCollection rows = Sql.Read($"SELECT * FROM BORROW WHERE(LATEST_RETURN_DATE > {DateTime.Now.ToString("yyyy/MM/dd")})");
+            return rows;
+        }
+
+        public enum SeatOperationCommand
+        {
+            Reserve,
+            cancel,
+        }
+
+        /// <summary>
+        /// 编辑座位功能
+        /// </summary>
+        public void EditSeat(string seatId, SeatOperationCommand seatOperationCommand)
+        {
+            DataRowCollection rows = Sql.Read(
+                        $"SELECT * " +
+                        $"FROM SEAT " +
+                        $"WHERE(SEAT_id = '{seatId}') ");
+
+            var seatState = EnumHelper.ToEnum<SeatState>(Convert.ToString(rows[0]["SEAT_STATE"]));
+
+            if (seatState == SeatState.unavailable)
+            {
+                throw new Exception("这座位暂时不能使用。");
+            }
+            else if ((seatState == SeatState.EmptySeat) && (seatOperationCommand == SeatOperationCommand.Reserve))
+            {
+                //処理
+            }
+            else if ((seatState == SeatState.RESERVED) && (seatOperationCommand == SeatOperationCommand.cancel))
+            {
+                //処理
+            }
+            else
+            {
+                throw new Exception();
+            }
         }
     }
 }
