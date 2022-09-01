@@ -20,6 +20,18 @@ namespace LibraryManagementSystem.Models.ManagementBooksModules
             Publisher,
         }
 
+        public enum ContinuedState
+        {
+            Continued,
+            Discontinued
+        }
+
+        public enum FineType
+        {
+            LostBook,
+            OverdueBook
+        }
+
         /// <summary>
         /// 图书录入功能
         /// </summary>
@@ -248,6 +260,153 @@ namespace LibraryManagementSystem.Models.ManagementBooksModules
             Sql.Execute(
                     $"DELETE FROM BOOK " +
                     $"WHERE(BOOK_ID = '{cancelBook.BookId}')");
+        }
+
+        /// <summary>
+        /// 超期受理功能
+        /// </summary>
+        ///
+        public void OverdueAccep(string readerId, string bookId)
+        {
+            DataRowCollection rows = Sql.Read(
+               $"SELECT BOOK_ID, READER_ID " +
+               $"FROM OVERDUE " +
+               $"WHERE(BOOK_ID = '{bookId}')");
+
+            string fineId = Convert.ToString(Convert.ToInt32(Sql.Read("SELECT * FROM FINE").Count) + 1);
+            //TODO
+
+            Sql.Execute(
+                $"INSERT INTO FINE " +
+                $"(	READER_ID, BOOK_ID, OVERDUE_TIME, FINE_ID, FINE_TYPE) " +
+                $"VALUES('{readerId}'," +
+                $"'{bookId}'," +
+                $"'{"OVERDUE_TIME"}'," +
+                $"'{fineId}'" +
+                $"'{Convert.ToString(FineType.OverdueBook)}')");
+        }
+
+        /// <summary>
+        /// 挂失受理功能
+        /// </summary>
+        ///
+        public void LossAccep(string bookId, string readerId)
+        {
+            DataRowCollection rows = Sql.Read(
+                $"SELECT BOOK_ID" +
+                $"FROM BOOK " +
+                $"WHERE(BOOK_ID = '{bookId}')");
+
+            string lossId = Convert.ToString(Convert.ToInt32(Sql.Read("SELECT * FROM LOSS").Count) + 1);
+
+            Sql.Execute(
+                $"INSERT INTO LOSS " +
+                $"(	LOSS_ID, READER_ID,  BOOK_ID, LOSS_TIME) " +
+                $"VALUES('{lossId}'," +
+                $"'{readerId}'," +
+                $"'{bookId}'," +
+                $"'{DateTime.Now.ToString("yyyy/MM/dd")}'");
+
+            string cancelId = Convert.ToString(Convert.ToInt32(Sql.Read("SELECT * FROM BOOKCANCEL").Count) + 1);
+            string isbn = Convert.ToString(Convert.ToInt32(Sql.Read("SELECT ISBN FROM BOOK").Count));
+
+            Sql.Execute(
+                   $"INSERT INTO BOOKCANCEL " +
+                   $"(BOOK_ID, CANCEL_ID, CANCEL_DATE, ISBN) " +
+                   $"VALUES('{bookId}'," +
+                   $"'{cancelId}'," +
+                   $"'{DateTime.Now.ToString("yyyy/MM/dd")}'," +
+                   $"'{isbn}'");
+
+            Sql.Execute($"DELETE FROM BOOK WHERE BOOK_ID = '{bookId}'");
+
+            string fineId = Convert.ToString(Convert.ToInt32(Sql.Read("SELECT * FROM FINE").Count) + 1);
+            //TODO
+
+            Sql.Execute(
+                $"INSERT INTO FINE " +
+                $"(	READER_ID, BOOK_ID, OVERDUE_TIME, FINE_ID, FINE_TYPE) " +
+                $"VALUES('{readerId}'," +
+                $"'{bookId}'," +
+                $"'{"OVERDUE_TIME"}'," +
+                $"'{fineId}'," +
+                $"'{Convert.ToString(FineType.LostBook)}')");
+        }
+
+        /// <summary>
+        /// 还书受理功能
+        /// </summary>
+        ///
+        public void ReturnAccep(string readerId, string bookId)
+        {
+            DataRowCollection rows = Sql.Read(
+                $"SELECT BOOK_ID" +
+                $"FROM BORROW " +
+                $"WHERE(BOOK_ID = '{bookId}')");
+
+            string returnId = Convert.ToString(Convert.ToInt32(Sql.Read("SELECT * FROM RETURN").Count) + 1);
+            string startDate = Convert.ToString(Convert.ToInt32(Sql.Read("SELECT BORROW_DATE FROM BORROW").Count));
+
+            Sql.Execute(
+                $"INSERT INTO RETURN " +
+                $"(READER_ID, BOOK_ID, START_TIME, END_TIME, RETURN_ID) " +
+                $"VALUES('{readerId}'," +
+                $"'{bookId}'," +
+                $"'{startDate}'," +
+                $"'{DateTime.Now.ToString("yyyy/MM/dd")}'," +
+                $"'{returnId}'");
+
+            Sql.Execute($"DELETE FROM BORROW WHERE BOOK_ID = '{bookId}'");
+        }
+
+        /// <summary>
+        /// 借书受理功能
+        /// </summary>
+        ///
+        public void BorrowAccep(string readerId, string bookId)
+        {
+            DataRowCollection rows = Sql.Read(
+
+                $"SELECT BOOK_ID , READER_ID" +
+                $"FROM BOOK_REVERSE " +
+                $"WHERE(BOOK_ID = '{bookId}')");
+
+            if (rows.Count == 1)
+            {
+                if (rows[0]["READER_ID"] != readerId)
+                {
+                    throw new Exception("不一致");
+                }
+
+                Sql.Execute($"DELETE FROM BOOK_REVERSE WHERE BOOK_ID = '{bookId}'");
+            }
+
+            if (rows.Count > 2)
+            {
+                throw new Exception("找到信息2个或以上的，逻辑不对");
+            }
+
+            DataRowCollection rows_over = Sql.Read(
+                 $"SELECT READER_ID" +
+                 $"FROM OVERDUE " +
+                 $"WHERE(READER_ID = '{readerId}')");
+
+            if (rows_over.Count >= 1)
+            {
+                throw new Exception("先处理超期受理");
+            }
+
+            string borrowId = Convert.ToString(Convert.ToInt32(Sql.Read("SELECT * FROM BORROW").Count) + 1);
+
+            Sql.Execute(
+               $"INSERT INTO BORROW " +
+               $"(READER_ID, BOOK_ID, BORROW_DATE, LATEST_RETURN_DATE , BORROW_ID , CONTINUED_STATE) " +
+               $"VALUES('{readerId}'," +
+               $"'{bookId}'," +
+               $"'{DateTime.Now.ToString("yyyy/MM/dd")}'," +
+               $"'{DateTime.Now.AddDays(14).ToString("yyyy/MM/dd")}'," +
+               $"'{borrowId}'," +
+               $"'{ Convert.ToString(ContinuedState.Continued)}'");
         }
     }
 }
