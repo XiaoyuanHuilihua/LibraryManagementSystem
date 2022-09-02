@@ -231,46 +231,11 @@ namespace LibraryManagementSystem.Models.UserManagementModules
         /// </summary>
         public DataRowCollection SearchTheListOfReadersWhoHaveNotReturnedBooks()
         {
-            //管理员通过该功能可以查看所有过期未还图读者的名单列表
-            //所需数据：	读者账号，读者姓名，图书编号，图书名，借阅日期，最晚归还日期，续借状态
-            DataRowCollection rows = Sql.Read($"SELECT * FROM BORROW WHERE(LATEST_RETURN_DATE > {DateTime.Now.ToString("yyyy/MM/dd")})");
-            return rows;
-        }
-
-        public enum SeatOperationCommand
-        {
-            Reserve,
-            cancel,
-        }
-
-        /// <summary>
-        /// 编辑座位功能
-        /// </summary>
-        public void EditSeat(string seatId, SeatOperationCommand seatOperationCommand)
-        {
             DataRowCollection rows = Sql.Read(
-                        $"SELECT * " +
-                        $"FROM SEAT " +
-                        $"WHERE(SEAT_id = '{seatId}') ");
-
-            var seatState = EnumHelper.ToEnum<SeatState>(Convert.ToString(rows[0]["SEAT_STATE"]));
-
-            if (seatState == SeatState.unavailable)
-            {
-                throw new Exception("这座位暂时不能使用。");
-            }
-            else if ((seatState == SeatState.EmptySeat) && (seatOperationCommand == SeatOperationCommand.Reserve))
-            {
-                //処理
-            }
-            else if ((seatState == SeatState.RESERVED) && (seatOperationCommand == SeatOperationCommand.cancel))
-            {
-                //処理
-            }
-            else
-            {
-                throw new Exception();
-            }
+                $"SELECT * " +
+                $"FROM BORROW " +
+                $"WHERE(LATEST_RETURN_DATE < TO_DATE('{DateTime.Now.ToString("yyyy/MM/dd")}','yyyy/MM/dd'))");
+            return rows;
         }
     }
 }

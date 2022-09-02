@@ -38,12 +38,18 @@ namespace LibraryManagementSystem.Tests
         [TestMethod]
         public void 查看个人信息()
         {
+            _ReaderModule.ApplyLibraryCard("王静", "123456", 15151515555, "8576");
+            string readerId = Convert.ToString(Convert.ToInt32(Sql.Read("SELECT * FROM BOOK_RESERVE").Count));
             Console.WriteLine("展示个人信息");
-            DataRow reader = _ReaderModule.ViewReaderInformation("17");
-            Assert.AreEqual("李春华", reader[1]);
+            DataRow reader = _ReaderModule.ViewReaderInformation($"{readerId}");
+            Assert.AreEqual("王静", reader[1]);
             Assert.AreEqual("123456", reader[2]);
             Assert.AreEqual(15151515555, System.Convert.ToInt64(reader[3]));
-            Assert.AreEqual("4568", reader[4]);
+            Assert.AreEqual("8576", reader[4]);
+
+            Sql.Execute(
+                $"DELETE FROM READER " +
+                $"WHERE BOOK_RESERVE_ID = '{readerId}'");
         }
 
         [TestMethod]
@@ -82,53 +88,35 @@ namespace LibraryManagementSystem.Tests
         }
 
         [TestMethod]
-        public void 查看座位功能()
-        {
-            DataRowCollection seats = _ReaderModule.ViewSeats();
-            for (var i = 0; i < seats.Count; i++)
-            {
-                Assert.AreEqual(0, System.Convert.ToInt32(seats[i][1]));
-                Assert.AreEqual("100", seats[i][2]);
-            }
-        }
-
-        [TestMethod]
-        public void 座位预约功能()
-        {
-            _ReaderModule.ReserveSeat("17", "s1", DateTime.Parse("2022/8/19"), DateTime.Parse("2022/8/19"));
-            DataRow reserve = Sql.Read("SELECT * FROM SEAT_RESERVE WHERE SEAT_RESERVE_ID='r6'")[0];
-            Assert.AreEqual("17", reserve[0]);///reader_id
-            Assert.AreEqual("s1", reserve[1]);///seat_id
-            Assert.AreEqual(DateTime.Parse("2022/8/19"), reserve[2]);
-            Assert.AreEqual(DateTime.Parse("2022/8/19"), reserve[3]);
-            Assert.AreEqual("r6", reserve[4]);
-
-            DataRow seat = Sql.Read("SELECT SEAT_STATE FROM SEAT WHERE SEAT_ID='s1'")[0];
-            Assert.AreEqual(1, System.Convert.ToInt32(seat[0]));
-        }
-
-        [TestMethod]
         public void 读者留言功能()
         {
-            _ReaderModule.ReaderComment("17", "3", "this is interesting", DateTime.Parse("2022/8/6"));
+            _ReaderModule.ReaderComment("17", "3", "this is interesting");
             DataRow comment = Sql.Read("SELECT * FROM COMMENTS WHERE READER_ID='17'")[0];
             Assert.AreEqual("17", comment[0]);
             Assert.AreEqual("3", comment[1]);
             Assert.AreEqual("this is interesting", comment[2]);
-            Assert.AreEqual(DateTime.Parse("2022/8/6"), comment[3]);
+            Assert.AreEqual(DateTime.Parse(DateTime.Now.ToString("yyyy/MM/dd")), comment[3]);
             Assert.AreEqual("1", comment[4]);
+
+            Sql.Execute(
+                $"DELETE FROM BOOK_RESERVE " +
+                $"WHERE BOOK_RESERVE_ID = '{comment[0]}'");
         }
 
         [TestMethod]
         public void 书籍预约()
         {
-            _ReaderModule.ReserveBook("17", 3, DateTime.Parse("2022/8/6"), DateTime.Parse("2022/8/6"));
+            _ReaderModule.ReserveBook("17", "3");
             DataRow BR = Sql.Read("SELECT * FROM BOOK_RESERVE WHERE BOOK_RESERVE_ID='br4'")[0];
             Assert.AreEqual("br4", BR[0]);
             Assert.AreEqual("17", BR[1]);
             Assert.AreEqual("3", BR[2]);
-            Assert.AreEqual(DateTime.Parse("2022/8/6"), BR[3]);
-            Assert.AreEqual(DateTime.Parse("2022/8/6"), BR[4]);
+            Assert.AreEqual(DateTime.Parse(DateTime.Now.ToString("yyyy/MM/dd")), BR[3]);
+            Assert.AreEqual(DateTime.Parse(DateTime.Now.AddDays(14).ToString("yyyy/MM/dd")), BR[4]);
+
+            Sql.Execute(
+                $"DELETE FROM BOOK_RESERVE " +
+                $"WHERE BOOK_RESERVE_ID = '{BR[0]}'");
         }
     }
 }
