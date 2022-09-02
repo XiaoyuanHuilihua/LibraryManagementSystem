@@ -1,5 +1,7 @@
 ﻿using LibraryManagementSystem.Controllers;
 using LibraryManagementSystem.Models.ManagementBooksModules;
+using LibraryManagementSystem.Models.ReaderModule;
+using LibraryManagementSystem.Models.UserManagementModules;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Data;
@@ -13,8 +15,23 @@ namespace LibraryManagementSystem.Tests
     [TestClass]
     public class ManagementBooksModuleTest
     {
+        /// <summary>
+        /// 书籍管理模块类
+        /// </summary>
         private readonly ManagementBooksModule _managementBooksModule =
             new ManagementBooksModule();
+
+        /// <summary>
+        /// 管理员模块类
+        /// </summary>
+        private readonly AdministratorModule _administratorModule =
+            new AdministratorModule();
+
+        /// <summary>
+        /// 读者模块类
+        /// </summary>
+        private readonly ReaderModule _readerModule =
+            new ReaderModule();
 
         /// <summary>
         /// 图书录入功能测试
@@ -248,6 +265,34 @@ namespace LibraryManagementSystem.Tests
         [TestMethod]
         public void 预约超期处理功能测试()
         {
+            _readerModule.ReserveBook("12", "9");
+            Sql.Execute($"UPDATE BOOK_RESERVE SET BOOK_OVERDUE_TIME = '2022/01/01' WHERE (BOOK_ID = '9')");
+            _managementBooksModule.ProcessReserveOverdue();
+            string actual = Convert.ToString(Sql.Read("SELECT * FROM BOOK_RESERVE WHERE(BOOK_ID = '9')").Count);
+            Assert.AreEqual("0", actual);
+        }
+
+        /// <summary>
+        /// 借书超期处理功能测试
+        /// </summary>
+        [TestMethod]
+        public void 借书超期处理功能测试()
+        {
+            _managementBooksModule.ProcessBorrowingOverdue();
+
+            DataRowCollection actual = Sql.Read("SELECT * FROM OVERDUE WHERE(BORROW_ID = 'br100')");
+            Assert.IsTrue(actual.Count != 0);
+        }
+
+        /// <summary>
+        /// 超期受理功能测试
+        /// </summary>
+        [TestMethod]
+        public void 超期受理功能测试()
+        {
+            _managementBooksModule.OverdueAccep("14", "2");
+            var rowsFINE = Sql.Read($"SELECT * FROM FINE WHERE (READER_ID = '14' AND BOOK_ID = '2')");
+            Assert.AreEqual(1, rowsFINE.Count);
         }
     }
 }

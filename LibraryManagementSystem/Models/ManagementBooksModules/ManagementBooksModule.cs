@@ -144,6 +144,7 @@ namespace LibraryManagementSystem.Models.ManagementBooksModules
         /// <summary>
         /// 图书注销功能
         /// </summary>
+        /// <param name="bookId">图书编号</param>
         public void BookCancellation(dynamic bookId)
         {
             DataRowCollection rows = Sql.Read(
@@ -179,19 +180,15 @@ namespace LibraryManagementSystem.Models.ManagementBooksModules
         /// </summary>
         public void ProcessReserveOverdue()
         {
-            //图书管理员可以定期检索超期预约。从图书预约表中删除相关信息，通知读者预约超期消息
-            //所需数据：	图书预约到期时间，读者账号，图书编号
-
-            //TODO 通知读者预约超期消息是通过邮箱地址通知，还是在网站内提示？
             DataRowCollection rows = Sql.Read(
                 $"SELECT BOOK_ID, READER_ID " +
-                $"FROM BOOL_RESERVE " +
-                $"WHERE(BOOK_OVERDUE_TIME < {DateTime.Now.ToString("yyyy/MM/dd")})");
+                $"FROM BOOK_RESERVE " +
+                $"WHERE (BOOK_OVERDUE_TIME < TO_DATE('{DateTime.Now.ToString("yyyy/MM/dd")}','yyyy/MM/dd'))");
 
             foreach (DataRow row in rows)
             {
                 Sql.Execute(
-                    $"DELETE FROM BOOL_RESERVE " +
+                    $"DELETE FROM BOOK_RESERVE " +
                     $"WHERE(BOOK_ID = '{Convert.ToString(row["BOOK_ID"])}')");
             }
         }
@@ -201,23 +198,22 @@ namespace LibraryManagementSystem.Models.ManagementBooksModules
         /// </summary>
         public void ProcessBorrowingOverdue()
         {
-            //图书管理员可以定期检索超期借阅。从借阅表中取得相关信息并录入到超期表，通知读者借书超期消息
-            //所需数据： 最晚还书日期，读者账号，图书编号
             DataRowCollection rows = Sql.Read(
-                $"SELECT BOOK_ID, READER_ID " +
+                $"SELECT * " +
                 $"FROM BORROW " +
-                $"WHERE(LATEST_RETURN_DATE < {DateTime.Now.ToString("yyyy/MM/dd")})");
+                $"WHERE(LATEST_RETURN_DATE < TO_DATE('{DateTime.Now.ToString("yyyy/MM/dd")}','yyyy/MM/dd'))");
 
             foreach (DataRow row in rows)
             {
+                string overdueId = $"od{Sql.Read("SELECT * FROM OVERDUE").Count + 1}";
                 Sql.Execute(
                     $"INSERT INTO OVERDUE " +
-                    $"(READER_ID, BOOK_ID, OVERDUE_BORROW_DATE, OVERDUE_ID, OVERDUE_LATEST_DATE) " +
-                    $"VALUES('{row["READER_ID"]}'," +
-                    $"'{row["BOOK_ID"]}'," +
-                    $"'{Convert.ToDateTime(row["OVERDUE_BORROW_DATE"]).ToString("yyyy/MM/dd")}'," +
-                    $"'{row["OVERDUE_ID"]}'" +
-                    $"'{row["OVERDUE_LATEST_DATE"]}')");
+                    $"(READER_ID, BORROW_ID, OVERDUE_BORROW_DATE, OVERDUE_ID, OVERDUE_LATEST_DATE) " +
+                    $"VALUES('{Convert.ToString(row["READER_ID"])}'," +
+                    $"'{Convert.ToString(row["BORROW_ID"])}'," +
+                    $"TO_DATE('{DateTime.Parse(Convert.ToString(row["BORROW_DATE"])).ToString("yyyy/MM/dd")}','yyyy/MM/dd'), " +
+                    $"'{overdueId}'," +
+                    $"TO_DATE('{DateTime.Parse(Convert.ToString(row["LATEST_RETURN_DATE"])).ToString("yyyy/MM/dd")}','yyyy/MM/dd'))");
             }
         }
 
@@ -265,25 +261,62 @@ namespace LibraryManagementSystem.Models.ManagementBooksModules
         /// <summary>
         /// 超期受理功能
         /// </summary>
-        ///
+        /// <param name="readerId">读者帐号</param>
+        /// <param name="bookId">图书编号</param>
         public void OverdueAccep(string readerId, string bookId)
         {
+            string borrowId = string.Empty;
+            string overdueId = string.Empty;
+
             DataRowCollection rows = Sql.Read(
-               $"SELECT BOOK_ID, READER_ID " +
+               $"SELECT BORROW_ID " +
                $"FROM OVERDUE " +
-               $"WHERE(BOOK_ID = '{bookId}')");
+               $"WHERE (READER_ID = '{readerId}')");
 
+            if (rows.Count == 0)
+            {
+                throw new Exception();
+            }
+
+            foreach (DataRow row in rows)
+            {
+                DataRowCollection bookIdRows = Sql.Read(
+                    $"SELECT BORROW_ID,BOOK_ID " +
+                    $"FROM BORROW " +
+                    $"WHERE BORROW_ID = '{row["BORROW_ID"]}'");
+
+                if (bookIdRows.Count == 0)
+                {
+                    throw new Exception();
+                }
+
+                foreach (DataRow bookIdRow in bookIdRows)
+                {
+                    if (bookIdRow["BOOK_ID"] == bookId)
+                    {
+                        borrowId = Convert.ToString(bookIdRow["BORROW_ID"]);
+                        overdueId = Convert.ToString(row["BORROW_ID"]);
+                        break;
+                    }
+                }
+            }
+
+            DataRowCollection datas = Sql.Read($"SELECT PRICE FROM BOOK WHERE BOOK_ID = '{bookId}'");
+            DataRow data = datas[0];
+            int price = Convert.ToInt32(data["PRICE"]);
             string fineId = Convert.ToString(Convert.ToInt32(Sql.Read("SELECT * FROM FINE").Count) + 1);
-            //TODO
 
-            Sql.Execute(
-                $"INSERT INTO FINE " +
-                $"(	READER_ID, BOOK_ID, OVERDUE_TIME, FINE_ID, FINE_TYPE) " +
+            Sql.Execute($"INSERT INTO FINE " +
+                $"(READER_ID, BOOK_ID, FINE_PRICE, FINE_ID, FINE_TYPE, PAYMENT_TIME) " +
                 $"VALUES('{readerId}'," +
                 $"'{bookId}'," +
-                $"'{"OVERDUE_TIME"}'," +
-                $"'{fineId}'" +
-                $"'{Convert.ToString(FineType.OverdueBook)}')");
+                $"{price}," +
+                $"'{fineId}'," +
+                $"{Convert.ToInt32(FineType.OverdueBook)}," +
+                $"'{DateTime.Now.ToString("yyyy/MM/dd")}')");
+
+            Sql.Execute($"DELETE FROM OVERDUE WHERE OVERDUE_ID = '{overdueId}'");
+            Sql.Execute($"DELETE FROM BORROW WHERE BORROW_ID = '{borrowId}'");
         }
 
         /// <summary>

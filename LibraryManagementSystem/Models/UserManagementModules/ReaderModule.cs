@@ -59,13 +59,20 @@ namespace LibraryManagementSystem.Models.ReaderModule
         }
 
         ///编辑个人信息
-        public void EditReaderInformation(string readerId, string readerName, string phoneNumber, string readerIdCard)///"这里是把所有信息分开传递还是放在一个集合中传递"
+        public void EditReaderInformation(string readerId, string readerName, string phoneNumber, string readerIdCard)
         {
+            //Sql.Execute(
+            //    $"UPDATE READER " +
+            //    $"SET READER_NAME = '{readerName}', PHONE_NUMBER = '{phoneNumber}', READER_IDCARD = '{readerIdCard}' " +
+            //    $"WHERE READER_ID = '{readerId}'"
+            //    );
+
             Sql.Execute(
                 $"UPDATE READER " +
-                $"SET READER_NAME='{readerName}',PHONE_NUMBER='{phoneNumber}', READER_IDCARD='{readerIdCard}' " +
-                $"WHERE READER_ID='{readerId}'"
-                );
+                $"SET READER_NAME = '{readerName}', " +
+                $"PHONE_NUMBER ='{phoneNumber}', " +
+                $"READER_IDCARD = '{readerIdCard}'" +
+                $"WHERE (READER_ID = '{readerId}');");
         }
 
         ///查看借阅历史
@@ -104,30 +111,32 @@ namespace LibraryManagementSystem.Models.ReaderModule
         }
 
         ///读者留言功能
-        public void ReaderComment(string readerId, string bookId, string content, DateTime commentTime)
+        public void ReaderComment(string readerId, string bookId, string content)
         {
-            int contentId = Sql.Read("SELECT * FROM COMMENTS").Count + 1;
+            string contentId = Convert.ToString(Sql.Read("SELECT * FROM COMMENTS").Count + 1);
             Sql.Execute(
                $"INSERT INTO COMMENTS" +
                $"(READER_ID, BOOK_ID, CONTENT, CONTENT_TIME, CONTENT_ID)" +
-               $"VALUES('{readerId}', '{bookId}', '{content}', TO_DATE('{commentTime}', 'YYYY-MM-DD HH24:MI:SS'), '{contentId}')"
+               $"VALUES('{readerId}', '{bookId}', '{content}', '{DateTime.Now.ToString("yyyy/MM/dd")}', '{contentId}')"
                );
         }
 
         ///书籍预约功能
-        public void ReserveBook(string readerId, int bookId, DateTime bookReserveTime, DateTime bookOverdueTime)
+        public void ReserveBook(string readerId, string bookId)
         {
             string bookReserveId = $"br{Sql.Read("SELECT * FROM BOOK_RESERVE").Count + 1}";
             Sql.Execute(
                $"INSERT INTO BOOK_RESERVE" +
                $"(BOOK_RESERVE_ID, READER_ID, BOOK_ID, BOOK_RESERVE_TIME, BOOK_OVERDUE_TIME)" +
-               $"VALUES('{bookReserveId}', '{readerId}', '{bookId}',  TO_DATE('{bookReserveTime}', 'YYYY-MM-DD HH24:MI:SS'),  TO_DATE('{bookOverdueTime}', 'YYYY-MM-DD HH24:MI:SS'))"
-               );
-            Sql.Execute(
-                $"UPDATE BOOK " +
-                $"SET LEND_RESERVE=LEND_RESERVE+1 " +
-                $"WHERE BOOK_ID='{bookId}'"
-                );
+               $"VALUES('{bookReserveId}', " +
+               $"'{readerId}', '{bookId}',  " +
+               $"'{DateTime.Now.ToString("yyyy/MM/dd")}', " +
+               $"'{DateTime.Now.AddDays(14).ToString("yyyy/MM/dd")}')");
+            //Sql.Execute(
+            //    $"UPDATE BOOK " +
+            //    $"SET LEND_RESERVE=LEND_RESERVE+1 " +
+            //    $"WHERE BOOK_ID='{bookId}'"
+            //    );
         }
     }
 }
