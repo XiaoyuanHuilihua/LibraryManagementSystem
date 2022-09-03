@@ -11,6 +11,9 @@ namespace LibraryManagementSystem.Models.ManagementBooksModules
 {
     public class ManagementBooksModule
     {
+        /// <summary>
+        /// 图书信息种类
+        /// </summary>
         public enum BookInfoKind
         {
             BookId,
@@ -20,12 +23,18 @@ namespace LibraryManagementSystem.Models.ManagementBooksModules
             Publisher,
         }
 
+        /// <summary>
+        /// 续借状态
+        /// </summary>
         public enum ContinuedState
         {
             Continued,
             Discontinued
         }
 
+        /// <summary>
+        /// 罚款类型
+        /// </summary>
         public enum FineType
         {
             LostBook,
@@ -220,6 +229,9 @@ namespace LibraryManagementSystem.Models.ManagementBooksModules
         /// <summary>
         /// 图书损坏处理功能
         /// </summary>
+        /// <param name="bookId">图书编号</param>
+        /// <param name="cancelId">注销Id</param>
+        /// <param name="reason"></param>
         public void DealWithDamagedBooks(string bookId, string cancelId, string reason = null)
         {
             //图书管理员对归还时损坏的图书进行罚款处理，从借书表中删除相关信息并录入到注销表，对图书信息进行修改
@@ -322,7 +334,8 @@ namespace LibraryManagementSystem.Models.ManagementBooksModules
         /// <summary>
         /// 挂失受理功能
         /// </summary>
-        ///
+        /// <param name="bookId">图书编号</param>
+        /// <param name="readerId">读者帐号</param>
         public void LossAccep(string bookId, string readerId)
         {
             DataRowCollection rows = Sql.Read(
@@ -354,7 +367,6 @@ namespace LibraryManagementSystem.Models.ManagementBooksModules
             Sql.Execute($"DELETE FROM BOOK WHERE BOOK_ID = '{bookId}'");
 
             string fineId = Convert.ToString(Convert.ToInt32(Sql.Read("SELECT * FROM FINE").Count) + 1);
-            //TODO
 
             Sql.Execute(
                 $"INSERT INTO FINE " +
@@ -369,7 +381,8 @@ namespace LibraryManagementSystem.Models.ManagementBooksModules
         /// <summary>
         /// 还书受理功能
         /// </summary>
-        ///
+        /// <param name="readerId">读者帐号</param>
+        /// <param name="bookId">图书编号</param>
         public void ReturnAccep(string readerId, string bookId)
         {
             DataRowCollection rows = Sql.Read(
@@ -395,7 +408,8 @@ namespace LibraryManagementSystem.Models.ManagementBooksModules
         /// <summary>
         /// 借书受理功能
         /// </summary>
-        ///
+        /// <param name="readerId">读者帐号</param>
+        /// <param name="bookId">图书编号</param>
         public void BorrowAccep(string readerId, string bookId)
         {
             DataRowCollection rows = Sql.Read(
