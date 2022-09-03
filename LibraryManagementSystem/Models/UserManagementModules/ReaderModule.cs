@@ -66,7 +66,13 @@ namespace LibraryManagementSystem.Models.ReaderModule
                 );
         }
 
-        ///修改密码
+        /// <summary>
+        /// 修改密码
+        /// </summary>
+        /// <param name="readerId"></param>
+        /// <param name="currentPassword"></param>
+        /// <param name="modifiedPassword"></param>
+        /// <returns></returns>
         public Boolean AlterPassword(string readerId, string currentPassword, string modifiedPassword)
         {
             DataRow reader;
@@ -83,7 +89,11 @@ namespace LibraryManagementSystem.Models.ReaderModule
             return false;
         }
 
-        ///查看个人信息
+        /// <summary>
+        /// 查看个人信息
+        /// </summary>
+        /// <param name="readerId"></param>
+        /// <returns></returns>
         public DataRow ViewReaderInformation(string readerId)
         {
             DataRowCollection readers = Sql.Read($"SELECT * FROM READER WHERE READER_ID='{readerId}'");
@@ -91,7 +101,13 @@ namespace LibraryManagementSystem.Models.ReaderModule
             return reader;
         }
 
-        ///编辑个人信息
+        /// <summary>
+        /// 编辑个人信息
+        /// </summary>
+        /// <param name="readerId"></param>
+        /// <param name="readerName"></param>
+        /// <param name="phoneNumber"></param>
+        /// <param name="readerIdCard"></param>
         public void EditReaderInformation(string readerId, string readerName, int phoneNumber, string readerIdCard)
         {
             DataRowCollection rows = Sql.Read($"SELECT * FROM READER WHERE READER_ID = '{readerId}'");
@@ -108,25 +124,42 @@ namespace LibraryManagementSystem.Models.ReaderModule
                 $"WHERE (READER_ID = '{readerId}')");
         }
 
-        ///查看借阅历史
+        /// <summary>
+        /// 查看借阅历史
+        /// </summary>
+        /// <param name="readerId"></param>
+        /// <returns></returns>
         public DataRowCollection SearchBorrowedHistory(string readerId)
         {
             return Sql.Read($"SELECT * FROM RETURN WHERE READER_ID='{readerId}'");
         }
 
-        ///查看当前借阅
+        /// <summary>
+        /// 查看当前借阅
+        /// </summary>
+        /// <param name="readerId"></param>
+        /// <returns></returns>
         public DataRowCollection SearchBorrowingHistory(string readerId)
         {
             return Sql.Read($"SELECT * FROM BORROW WHERE READER_ID='{readerId}'");
         }
 
-        ///查看座位功能
+        /// <summary>
+        /// 查看座位功能
+        /// </summary>
+        /// <returns></returns>
         public DataRowCollection ViewSeats()
         {
             return Sql.Read("SELECT * FROM SEAT");
         }
 
-        ///座位预约功能
+        /// <summary>
+        /// 座位预约功能
+        /// </summary>
+        /// <param name="readerId"></param>
+        /// <param name="seatId"></param>
+        /// <param name="seatReserveTime"></param>
+        /// <param name="seatOverdueTime"></param>
         public void ReserveSeat(string readerId, string seatId, DateTime seatReserveTime, DateTime seatOverdueTime)
         {
             string seatReserveId = $"r{Sql.Read("SELECT * FROM SEAT_RESERVE").Count + 1}";
@@ -143,7 +176,12 @@ namespace LibraryManagementSystem.Models.ReaderModule
                 );
         }
 
-        ///读者留言功能
+        /// <summary>
+        /// 读者留言功能
+        /// </summary>
+        /// <param name="readerId"></param>
+        /// <param name="bookId"></param>
+        /// <param name="content"></param>
         public void ReaderComment(string readerId, string bookId, string content)
         {
             string contentId = Convert.ToString(Sql.Read("SELECT * FROM COMMENTS").Count + 1);
@@ -154,7 +192,11 @@ namespace LibraryManagementSystem.Models.ReaderModule
                );
         }
 
-        ///书籍预约功能
+        /// <summary>
+        /// 书籍预约功能
+        /// </summary>
+        /// <param name="readerId"></param>
+        /// <param name="bookId"></param>
         public void ReserveBook(string readerId, string bookId)
         {
             string bookReserveId = $"br{Sql.Read("SELECT * FROM BOOK_RESERVE").Count + 1}";

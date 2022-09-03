@@ -208,7 +208,6 @@ namespace LibraryManagementSystem.Models.UserManagementModules
         /// </summary>
         public DataRowCollection SearchBorrowedHistory(string readerId)
         {
-            //TODO:修改SQL语句的表名称
             DataRowCollection rows = Sql.Read(
                 $"SELECT BORROW.READER_ID," +
                 $" BORROW.BOOK_ID, BOOK.BOOK_NAME," +

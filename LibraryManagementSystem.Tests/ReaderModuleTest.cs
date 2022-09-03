@@ -16,6 +16,9 @@ namespace LibraryManagementSystem.Tests
         private ReaderModule _ReaderModule = new ReaderModule();
         private AdministratorModule _administratorModule = new AdministratorModule();
 
+        /// <summary>
+        /// 读者借书证办理或读者注册
+        /// </summary>
         [TestMethod]
         public void 读者借书证办理或读者注册()
         {
@@ -27,6 +30,9 @@ namespace LibraryManagementSystem.Tests
             Assert.AreEqual("4568", reader.ReaderIdCard);
         }
 
+        /// <summary>
+        /// 修改用户密码
+        /// </summary>
         [TestMethod]
         public void 修改用户密码()
         {
@@ -35,6 +41,9 @@ namespace LibraryManagementSystem.Tests
             Assert.AreEqual("111111", reader.Password);
         }
 
+        /// <summary>
+        /// 查看个人信息
+        /// </summary>
         [TestMethod]
         public void 查看个人信息()
         {
@@ -52,6 +61,9 @@ namespace LibraryManagementSystem.Tests
                 $"WHERE READER_ID = '{readerId}'");
         }
 
+        /// <summary>
+        /// 编辑个人信息
+        /// </summary>
         [TestMethod]
         public void 编辑个人信息()
         {
@@ -62,6 +74,9 @@ namespace LibraryManagementSystem.Tests
             Assert.AreEqual("123456", reader.ReaderIdCard);
         }
 
+        /// <summary>
+        /// 查看借阅信息
+        /// </summary>
         [TestMethod]
         public void 查看借阅信息()
         {
@@ -87,6 +102,9 @@ namespace LibraryManagementSystem.Tests
             }
         }
 
+        /// <summary>
+        /// 读者留言功能
+        /// </summary>
         [TestMethod]
         public void 读者留言功能()
         {
@@ -103,6 +121,9 @@ namespace LibraryManagementSystem.Tests
                 $"WHERE BOOK_RESERVE_ID = '{comment[0]}'");
         }
 
+        /// <summary>
+        /// 书籍预约
+        /// </summary>
         [TestMethod]
         public void 书籍预约()
         {
