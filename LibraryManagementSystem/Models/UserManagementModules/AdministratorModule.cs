@@ -45,6 +45,22 @@ namespace LibraryManagementSystem.Models.UserManagementModules
         }
 
         /// <summary>
+        /// 管理员登录
+        /// </summary>
+        /// <param name="adminName"></param>
+        /// <param name="pwd"></param>
+        /// <returns></returns>
+        public Boolean adminLogin(string adminName, string pwd)
+        {
+            DataRow admin = Sql.Read($"SELECT ADMIN_PASSWORD FROM ADMINISTRATOR WHERE ADMIN_NAME='{adminName}'")[0];
+            if (String.Equals(pwd, admin[0]))
+            {
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
         ///搜索帐户功能
         /// </summary>
         /// <param name="ReaderInfoKind">标识的分类</param>
