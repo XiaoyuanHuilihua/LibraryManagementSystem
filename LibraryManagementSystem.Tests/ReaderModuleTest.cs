@@ -38,24 +38,24 @@ namespace LibraryManagementSystem.Tests
         [TestMethod]
         public void 查看个人信息()
         {
-            _ReaderModule.ApplyLibraryCard("王静", "123456", 15151515555, "8576");
-            string readerId = Convert.ToString(Convert.ToInt32(Sql.Read("SELECT * FROM BOOK_RESERVE").Count));
+            _ReaderModule.ApplyLibraryCard("王静", "123456", 15151515555, "sample12345");//readerId = 9
+            string readerId = "9";
             Console.WriteLine("展示个人信息");
             DataRow reader = _ReaderModule.ViewReaderInformation($"{readerId}");
             Assert.AreEqual("王静", reader[1]);
             Assert.AreEqual("123456", reader[2]);
             Assert.AreEqual(15151515555, System.Convert.ToInt64(reader[3]));
-            Assert.AreEqual("8576", reader[4]);
+            Assert.AreEqual("sample12345", reader[4]);
 
             Sql.Execute(
                 $"DELETE FROM READER " +
-                $"WHERE BOOK_RESERVE_ID = '{readerId}'");
+                $"WHERE READER_ID = '{readerId}'");
         }
 
         [TestMethod]
         public void 编辑个人信息()
         {
-            _ReaderModule.EditReaderInformation("17", "郑春华", "123456789", "123456");
+            _ReaderModule.EditReaderInformation("17", "郑春华", 123456789, "123456");
             var reader = _administratorModule.SearchReaderInfo(AdministratorModule.ReaderInfoKind.ReaderId, "17")[0];
             Assert.AreEqual("郑春华", reader.ReaderName);
             Assert.AreEqual(123456789, reader.PhoneNumber);

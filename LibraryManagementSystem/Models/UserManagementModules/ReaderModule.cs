@@ -8,12 +8,11 @@ using System.Threading.Tasks;
 
 namespace LibraryManagementSystem.Models.ReaderModule
 {
+    /// <summary>
+    /// 读者个人信息管理模块
+    /// </summary>
     public class ReaderModule
     {
-        /// <summary>
-        /// 读者个人信息管理模块
-        /// </summary>
-
         /// <summary>
         /// 构造函数
         /// </summary>
@@ -22,12 +21,44 @@ namespace LibraryManagementSystem.Models.ReaderModule
             //处理
         }
 
-        ///借书证办理
+        /// <summary>
+        /// 用户登录
+        /// </summary>
+        /// <param name="readerIdCard"></param>
+        /// <param name="pwd"></param>
+        /// <returns></returns>
+        public Boolean userLogin(string readerIdCard, string pwd)
+        {
+            DataRow reader = Sql.Read($"SELECT READER_PASSWORD FROM READER WHERE READER_IDCARD={readerIdCard}")[0];
+            if (String.Equals(pwd, reader[0]))
+            {
+                Sql.Execute($"update reader set STATE=1  WHERE READER_IDCARD={readerIdCard}");
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// 用户推出
+        /// </summary>
+        /// <param name="readerIdCard"></param>
+        public void userLogout(string readerIdCard)
+        {
+            Sql.Execute($"update reader set STATE=0  WHERE READER_IDCARD={readerIdCard}");
+        }
+
+        /// <summary>
+        /// 借书证办理
+        /// </summary>
+        /// <param name="readerName"></param>
+        /// <param name="password"></param>
+        /// <param name="phoneNumber"></param>
+        /// <param name="readerIdCard"></param>
         public void ApplyLibraryCard(string readerName, string password, long phoneNumber, string readerIdCard)
         {
             DataRowCollection readers = Sql.Read("SELECT * FROM READER");
             int count = readers.Count;
-            var readerId = Convert.ToInt32(readers[count - 1][0]) + 1;
+            var readerId = Convert.ToString(count + 1);
             Sql.Execute(
                 $"INSERT INTO READER" +
                 $"(READER_ID, READER_NAME, READER_PASSWORD, PHONE_NUMBER, READER_IDCARD)" +
@@ -55,24 +86,26 @@ namespace LibraryManagementSystem.Models.ReaderModule
         ///查看个人信息
         public DataRow ViewReaderInformation(string readerId)
         {
-            return Sql.Read($"SELECT * FROM READER WHERE READER_ID='{readerId}'")[0];
+            DataRowCollection readers = Sql.Read($"SELECT * FROM READER WHERE READER_ID='{readerId}'");
+            DataRow reader = readers[0];
+            return reader;
         }
 
         ///编辑个人信息
-        public void EditReaderInformation(string readerId, string readerName, string phoneNumber, string readerIdCard)
+        public void EditReaderInformation(string readerId, string readerName, int phoneNumber, string readerIdCard)
         {
-            //Sql.Execute(
-            //    $"UPDATE READER " +
-            //    $"SET READER_NAME = '{readerName}', PHONE_NUMBER = '{phoneNumber}', READER_IDCARD = '{readerIdCard}' " +
-            //    $"WHERE READER_ID = '{readerId}'"
-            //    );
-
+            DataRowCollection rows = Sql.Read($"SELECT * FROM READER WHERE READER_ID = '{readerId}'");
+            if (rows.Count == 0 || rows.Count >= 2)
+            {
+                throw new Exception();
+            }
+            DataRow reader = rows[0];
             Sql.Execute(
                 $"UPDATE READER " +
-                $"SET READER_NAME = '{readerName}', " +
-                $"PHONE_NUMBER ='{phoneNumber}', " +
-                $"READER_IDCARD = '{readerIdCard}'" +
-                $"WHERE (READER_ID = '{readerId}');");
+                $"SET (READER_NAME = '{readerName}', " +
+                $"PHONE_NUMBER = {phoneNumber}, " +
+                $"READER_IDCARD = '{readerIdCard}') " +
+                $"WHERE (READER_ID = '{readerId}')");
         }
 
         ///查看借阅历史
