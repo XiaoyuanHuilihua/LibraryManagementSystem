@@ -1,4 +1,5 @@
-﻿using LibraryManagementSystem.Models.UserManagementModules;
+﻿using LibraryManagementSystem.Controllers;
+using LibraryManagementSystem.Models.UserManagementModules;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System;
@@ -13,79 +14,82 @@ namespace MvcMovie.Controllers
         private AdministratorModule _administratorModule = new AdministratorModule();
 
         /// <summary>
-        /// 搜索所有用户
+        /// 管理员登录的连接
         /// </summary>
         /// <returns></returns>
-        [Route("/views_readers")]
-        [HttpGet]
-        public Boolean ViewAllReaderInfo()
-        {
-            Dictionary<string, Object> dataReturn = new Dictionary<string, Object>();
-            List<Object> datasReturn = new List<object>();
-            List<Object> readersList = new List<object>();
-            Dictionary<string, string> readerInfo = new Dictionary<string, string>();
-
-            string adminId = HttpContext.Request.Form["adminId"];
-            if (_administratorModule.CheckReturnReaderInfo(adminId))
-            {
-                dataReturn.Add("status", "true");
-                DataRowCollection infos = _administratorModule.ViewAllReaderInformation();
-                foreach (DataRow info in infos)
-                {
-                    readerInfo.Add("readerId", info[0].ToString());
-                    readerInfo.Add("name", info[1].ToString());
-                    readerInfo.Add("phone", info[3].ToString());
-                    readerInfo.Add("IdCard", info[4].ToString());
-                    readersList.Add(readerInfo);
-                }
-                dataReturn.Add("userData", readersList);
-                datasReturn.Add(dataReturn);
-            }
-        }
-
-        [Route("/user_login")]
+        [Route("/admin_login")]
         [HttpPost]
         public Boolean readerLogin()
         {
-            string phone = HttpContext.Request.Form["phone"];
+            string adminId = HttpContext.Request.Form["adminId"];
             string pwd = HttpContext.Request.Form["pwd"];
-            if (_readerModule.readerLogin(phone, pwd))
+            if (_administratorModule.adminLogin(adminId, pwd))
                 return true;
             return false;
         }
 
-        [Route("/user_info")]
+        /// <summary>
+        /// 搜索所有用户的连接
+        /// </summary>
+        /// <returns></returns>
+        [Route("/views_readers")]
         [HttpGet]
-        public string viewUserInfo()
+        public string ViewAllReaderInfo()
         {
             Dictionary<string, Object> dataReturn = new Dictionary<string, Object>();
-            List<Object> userList = new List<object>();
-            Dictionary<string, string> userInfo = new Dictionary<string, string>();
+            List<Object> readersList = new List<object>();
 
-            string readerId = HttpContext.Request.Query["readerId"];
-            if (_readerModule.readerCheck(readerId))
+            dataReturn.Add("status", true);
+            DataRowCollection infos = Sql.Read("SELECT * FROM READER");
+            foreach (DataRow info in infos)
             {
-                dataReturn.Add("status", "true");
-                DataRow info = _readerModule.ViewReaderInformation(readerId);
-                userInfo.Add("readerId", info[0].ToString());
-                userInfo.Add("name", info[1].ToString());
-                userInfo.Add("phone", info[3].ToString());
-                userInfo.Add("IdCard", info[4].ToString());
-                userList.Add(userInfo);
-                dataReturn.Add("userData", userList);
-                return JsonConvert.SerializeObject(dataReturn);
+                Dictionary<string, string> readerInfo = new Dictionary<string, string>();
+                readerInfo.Add("readerId", info[0].ToString());
+                readerInfo.Add("name", info[1].ToString());
+                readerInfo.Add("phone", info[3].ToString());
+                readerInfo.Add("IdCard", info[4].ToString());
+                readersList.Add(readerInfo);
             }
-            dataReturn.Add("status", "false");
-            dataReturn.Add("userData", userList);
+            dataReturn.Add("userData", readersList);
             return JsonConvert.SerializeObject(dataReturn);
         }
 
-        [Route("/user_logout")]
+        /// <summary>
+        /// 查看过期未还书的读者名的连接
+        /// </summary>
+        /// <returns></returns>
+        [Route("/view_unreturned")]
         [HttpGet]
-        public void userLogout()
+        public string ViewUnreturnedList()
         {
-            string phone = HttpContext.Request.Query["phone"];
-            _readerModule.readerLogout(phone);
+            Dictionary<string, Object> dataReturn = new Dictionary<string, Object>();
+            List<Object> unreturnedList = new List<object>();
+
+            dataReturn.Add("status", true);
+            DataRowCollection infos = _administratorModule.SearchTheListOfReadersWhoHaveNotReturnedBooks();
+            foreach (DataRow info in infos)
+            {
+                Dictionary<string, string> unreturnInfo = new Dictionary<string, string>();
+                unreturnInfo.Add("readerId", info[0].ToString());
+                unreturnInfo.Add("bookId", info[1].ToString());
+                unreturnInfo.Add("borrowDate", info[3].ToString());
+                unreturnInfo.Add("latestReturnDate", info[4].ToString());
+                unreturnInfo.Add("borrowId", info[4].ToString());
+                unreturnInfo.Add("continuedState", info[4].ToString());
+                unreturnedList.Add(unreturnInfo);
+            }
+            dataReturn.Add("nameList", unreturnedList);
+            return JsonConvert.SerializeObject(dataReturn);
         }
+
+        /*
+        管理员登录：OK
+        搜索帐户(读者)功能：->搜索所有读者信息OK，用js实现这功能？
+        编辑帐户(读者)功能：
+        查看读者借阅历史功能：
+        发送通知功能：
+        查看过期未还书的读者名单功能：OK
+        编辑座位功能：
+        */
     }
 }

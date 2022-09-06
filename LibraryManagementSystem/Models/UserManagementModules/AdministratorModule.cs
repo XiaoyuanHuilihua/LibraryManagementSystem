@@ -63,9 +63,9 @@ namespace LibraryManagementSystem.Models.UserManagementModules
         /// <param name="adminName"></param>
         /// <param name="pwd"></param>
         /// <returns></returns>
-        public Boolean adminLogin(string adminName, string pwd)
+        public Boolean adminLogin(string adminId, string pwd)
         {
-            DataRow admin = Sql.Read($"SELECT ADMIN_PASSWORD FROM ADMINISTRATOR WHERE ADMIN_NAME='{adminName}'")[0];
+            DataRow admin = Sql.Read($"SELECT ADMIN_PASSWORD FROM ADMINISTRATOR WHERE ADMIN_ID='{adminId}'")[0];
             if (String.Equals(pwd, admin[0]))
             {
                 return true;
@@ -142,34 +142,15 @@ namespace LibraryManagementSystem.Models.UserManagementModules
         /// <param name="reader">相应的读者的ValueObject</param>
         /// <param name="infoKind">要修改的信息标识</param>
         /// <param name="updated">修改后的内容</param>
-        public void UpdateReaderInfo(Reader reader, ReaderInfoKind infoKind, Object updated)
+        public void UpdateReaderInfo(string readerId, string readerName, long phoneNumber, string readerIdCard)
         {
-            switch (infoKind)
-            {
-                case (ReaderInfoKind.ReaderId):
-                    reader.ReaderId = (string)updated;
-                    break;
-
-                case (ReaderInfoKind.ReaderName):
-                    reader.ReaderName = (string)updated;
-                    break;
-
-                case (ReaderInfoKind.Password):
-                    reader.Password = (string)updated;
-                    break;
-
-                case (ReaderInfoKind.PhoneNumber):
-                    reader.PhoneNumber = (long)updated;
-                    break;
-
-                case (ReaderInfoKind.ReaderIdCard):
-                    reader.ReaderIdCard = (string)updated;
-                    break;
-
-                default:
-                    throw new Exception();
-                    break;
-            }
+            Sql.Execute(
+                $"UPDATE READER SET " +
+                $"READER_ID ='{readerId}', " +
+                $"READER_NAME ='{readerName}', " +
+                $"PHONE_NUMBER ={phoneNumber}, " +
+                $"READER_IDCARD ='{readerIdCard}' " +
+                $"WHERE READER_ID = '{readerId}' ");
         }
 
         /// <summary>
@@ -236,7 +217,6 @@ namespace LibraryManagementSystem.Models.UserManagementModules
                 throw new Exception("搜索结果为0。");
             }
 
-            //这是随便的值
             return rows;
         }
 
