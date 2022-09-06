@@ -22,12 +22,25 @@ namespace LibraryManagementSystem.Models.ReaderModule
         }
 
         /// <summary>
+        /// 判断读者是否存在
+        /// </summary>
+        /// <param name="readerId"></param>
+        /// <returns></returns>
+        public Boolean readerCheck(string readerId)
+        {
+            DataRow status = Sql.Read($"SELECT STATE FROM READER WHERE READER_ID='{readerId}'")[0];
+            if (System.Convert.ToBoolean(status[0]))
+                return true;
+            return false;
+        }
+
+        /// <summary>
         /// 用户登录
         /// </summary>
         /// <param name="readerIdCard"></param>
         /// <param name="pwd"></param>
         /// <returns></returns>
-        public Boolean userLogin(string readerIdCard, string pwd)
+        public Boolean readerLogin(string readerIdCard, string pwd)
         {
             DataRow reader = Sql.Read($"SELECT READER_PASSWORD FROM READER WHERE READER_IDCARD={readerIdCard}")[0];
             if (String.Equals(pwd, reader[0]))
@@ -42,7 +55,7 @@ namespace LibraryManagementSystem.Models.ReaderModule
         /// 用户推出
         /// </summary>
         /// <param name="readerIdCard"></param>
-        public void userLogout(string readerIdCard)
+        public void readerLogout(string readerIdCard)
         {
             Sql.Execute($"update reader set STATE=0  WHERE READER_IDCARD={readerIdCard}");
         }
@@ -54,16 +67,22 @@ namespace LibraryManagementSystem.Models.ReaderModule
         /// <param name="password"></param>
         /// <param name="phoneNumber"></param>
         /// <param name="readerIdCard"></param>
-        public void ApplyLibraryCard(string readerName, string password, long phoneNumber, string readerIdCard)
+        public Boolean readerResister(string readerName, string password, long phoneNumber, string readerIdCard)
         {
-            DataRowCollection readers = Sql.Read("SELECT * FROM READER");
-            int count = readers.Count;
-            var readerId = Convert.ToString(count + 1);
-            Sql.Execute(
-                $"INSERT INTO READER" +
-                $"(READER_ID, READER_NAME, READER_PASSWORD, PHONE_NUMBER, READER_IDCARD)" +
-                $"VALUES('{readerId}', '{readerName}', '{password}', '{phoneNumber}', '{readerIdCard}')"
-                );
+            try
+            {
+                DataRowCollection readers = Sql.Read("SELECT * FROM READER");
+                int count = readers.Count;
+                var readerId = Convert.ToString(count + 1);
+                Sql.Execute(
+                    $"INSERT INTO READER" +
+                    $"(READER_ID, READER_NAME, READER_PASSWORD, PHONE_NUMBER, READER_IDCARD)" +
+                    $"VALUES('{readerId}', '{readerName}', '{password}', '{phoneNumber}', '{readerIdCard}')"
+                    );
+                return true;
+            }
+            catch { }
+            return false;
         }
 
         /// <summary>

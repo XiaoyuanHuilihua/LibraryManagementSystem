@@ -45,6 +45,19 @@ namespace LibraryManagementSystem.Models.UserManagementModules
         }
 
         /// <summary>
+        /// 判断管理员是否存在
+        /// </summary>
+        /// <param name="adminId"></param>
+        /// <returns></returns>
+        public Boolean CheckReturnReaderInfo(string adminId)
+        {
+            DataRow status = Sql.Read($"SELECT STATE FROM ADMINISTRATOR WHERE ADMIN_ID='{adminId}'")[0];
+            if (System.Convert.ToBoolean(status[0]))
+                return true;
+            return false;
+        }
+
+        /// <summary>
         /// 管理员登录
         /// </summary>
         /// <param name="adminName"></param>
@@ -251,6 +264,16 @@ namespace LibraryManagementSystem.Models.UserManagementModules
                 $"FROM BORROW " +
                 $"WHERE(LATEST_RETURN_DATE < TO_DATE('{DateTime.Now.ToString("yyyy/MM/dd")}','yyyy/MM/dd'))");
             return rows;
+        }
+
+        /// <summary>
+        /// 查看所有读者信息
+        /// </summary>
+        /// <returns></returns>
+        public DataRowCollection ViewAllReaderInformation()
+        {
+            DataRowCollection readers = Sql.Read($"SELECT READER_ID, READER_NAME, PHONE_NUMBER, READER_IDCARD FROM READER");
+            return readers;
         }
     }
 }

@@ -258,7 +258,7 @@ namespace LibraryManagementSystem.Models.ManagementBooksModules
 
             Sql.Execute(
                     $"INSERT INTO BOOKCANCEL " +
-                    $"(BOOK_ID, CANCEL_ID, CANCEL_DATE, ISBN) " +
+                    $"(BOOK_ID, CANCEL_ID, CANCEL_DATE, ISBN, REASON) " +
                     $"VALUES('{cancelBook.BookId}'," +
                     $"'{cancelId}'," +
                     $"'{Convert.ToDateTime(DateTime.Now.ToString("yyyy/MM/dd"))}'," +
