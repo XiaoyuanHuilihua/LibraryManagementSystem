@@ -38,7 +38,8 @@ namespace LibraryManagementSystem.Models.ManagementBooksModules
         public enum FineType
         {
             LostBook,
-            OverdueBook
+            OverdueBook,
+            DamagedBook,
         }
 
         /// <summary>
@@ -154,10 +155,10 @@ namespace LibraryManagementSystem.Models.ManagementBooksModules
         /// 图书注销功能
         /// </summary>
         /// <param name="bookId">图书编号</param>
-        public void BookCancellation(dynamic bookId)
+        public void BookCancellation(dynamic bookId, string reason)
         {
             DataRowCollection rows = Sql.Read(
-                $"SELECT BOOK_ID, ISBN, BOOK_NAME, AUTHOR, PUBLISHER, PUBLISH_DATE, LEND_RESERVE, BOOK_DETAIL, PICTURE_LIST, PRICE " +
+                $"SELECT BOOK_ID, ISBN, BOOK_NAME, AUTHOR, PUBLISHER, PUBLISH_DATE, LEND_RESERVE, BOOK_DETAIL, PRICE " +
                 $"FROM BOOK " +
                 $"WHERE(BOOK_ID = '{bookId}')");
 
@@ -173,7 +174,7 @@ namespace LibraryManagementSystem.Models.ManagementBooksModules
             Sql.Execute($"DELETE FROM BOOK WHERE BOOK_ID = '{bookId}'");
 
             string cancelId = Convert.ToString(Sql.Read($"SELECT * FROM BOOKCANCEL").Count + 1);
-            var bookCancelObj = new Bookcancel(bookId, cancelId, DateTime.Now, Convert.ToString(rows[0]["ISBN"]));
+            var bookCancelObj = new Bookcancel(bookId, cancelId, DateTime.Now, Convert.ToString(rows[0]["ISBN"]), reason);
 
             Sql.Execute(
                 $"INSERT INTO BOOKCANCEL " +
@@ -181,7 +182,8 @@ namespace LibraryManagementSystem.Models.ManagementBooksModules
                 $"VALUES('{bookCancelObj.BookId}'," +
                 $"'{bookCancelObj.CancelId}'," +
                 $"'{bookCancelObj.CancelDate.ToString("yyyy/MM/dd")}'," +
-                $"'{bookCancelObj.ISBN}')");
+                $"'{bookCancelObj.ISBN}'" +
+                $"'{bookCancelObj.Reason}')");
         }
 
         /// <summary>
@@ -232,7 +234,7 @@ namespace LibraryManagementSystem.Models.ManagementBooksModules
         /// <param name="bookId">图书编号</param>
         /// <param name="cancelId">注销Id</param>
         /// <param name="reason"></param>
-        public void DealWithDamagedBooks(string bookId, string cancelId, string reason = null)
+        public void DealWithDamagedBooks(string readerId, string bookId, string reason = null)
         {
             //图书管理员对归还时损坏的图书进行罚款处理，从借书表中删除相关信息并录入到注销表，对图书信息进行修改
             //所需数据：	读者账号，图书编号，图书标价
@@ -247,6 +249,8 @@ namespace LibraryManagementSystem.Models.ManagementBooksModules
                 throw new Exception("逻辑不对");
             }
 
+            string cancelId = Convert.ToString(Sql.Read($"SELECT * FROM BOOKCANCEL").Count + 1);
+
             Book cancelBook = new Book(
                 bookInfo[0].BookId,
                 bookInfo[0].ISBN,
@@ -254,7 +258,10 @@ namespace LibraryManagementSystem.Models.ManagementBooksModules
                 bookInfo[0].Author,
                 bookInfo[0].Publisher,
                 bookInfo[0].PublishDate,
-                bookInfo[0].BookDetail);
+                bookInfo[0].BookDetail,
+                bookInfo[0].Price);
+
+            string fineId = Convert.ToString(Sql.Read($"SELECT * FROM FINE").Count + 1);
 
             Sql.Execute(
                     $"INSERT INTO BOOKCANCEL " +
@@ -264,6 +271,16 @@ namespace LibraryManagementSystem.Models.ManagementBooksModules
                     $"'{Convert.ToDateTime(DateTime.Now.ToString("yyyy/MM/dd"))}'," +
                     $"'{cancelBook.ISBN}'" +
                     $"'{reason}')");
+
+            Sql.Execute(
+                    $"INSERT INTO FINE " +
+                    $"(READER_ID, BOOK_ID, FINE_PRICE, FINE_ID, FINE_TYPE, PAYMENT_TIME) " +
+                    $"VALUES('{readerId}'," +
+                    $"'{cancelBook.BookId}'," +
+                    $"'{cancelBook.Price}'," +
+                    $"'{fineId}'," +
+                    $"'{FineType.DamagedBook}'," +
+                    $"'{Convert.ToDateTime(DateTime.Now.ToString("yyyy/MM/dd"))}')");
 
             Sql.Execute(
                     $"DELETE FROM BOOK " +

@@ -15,11 +15,11 @@ namespace MvcMovie.Controllers
         ----需要的API----
         管理员登录：OK
         管理员退出：OK
-        搜索帐户(读者)功能：->搜索所有读者信息OK，用js实现这功能？
+        搜索帐户(读者)功能：(->搜索所有读者信息OK，用js实现这功能？) OK
+        查看过期未还书的读者名单功能：OK
         编辑帐户(读者)功能：
         查看读者借阅历史功能：
         发送通知功能：
-        查看过期未还书的读者名单功能：OK
         编辑座位功能：
         */
 
@@ -104,5 +104,10 @@ namespace MvcMovie.Controllers
             dataReturn.Add("nameList", unreturnedList);
             return JsonConvert.SerializeObject(dataReturn);
         }
+
+        //编辑帐户(读者)功能：
+        //查看读者借阅历史功能：
+        //发送通知功能：
+        //编辑座位功能：
     }
 }

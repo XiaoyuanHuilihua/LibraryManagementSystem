@@ -229,7 +229,7 @@ namespace LibraryManagementSystem.Tests
                 throw new Exception();
             }
 
-            _managementBooksModule.BookCancellation("987654321");
+            _managementBooksModule.BookCancellation("987654321", "This book is too old.");
 
             DataRowCollection testDataRowCollection =
                Sql.Read(
@@ -243,11 +243,13 @@ namespace LibraryManagementSystem.Tests
                 string actualCancelId = Convert.ToString(testDataRowCollection[0]["CANCEL_ID"]);
                 string actualISBN = Convert.ToString(testDataRowCollection[0]["ISBN"]);
                 string actualCancelDate = Convert.ToDateTime(testDataRowCollection[0]["CANCEL_DATE"]).ToString("yyyy/MM/dd");
+                string actualReason = Convert.ToString(testDataRowCollection[0]["REASON"]);
 
                 Assert.AreEqual("987654321", actualBookId);
                 Assert.AreEqual("1", actualCancelId);
                 Assert.AreEqual("TestISBN1234567890", actualISBN);
                 Assert.AreEqual(DateTime.Now.ToString("yyyy/MM/dd"), actualCancelDate);
+                Assert.AreEqual("This book is too old.", actualReason);
             }
             else
             {
