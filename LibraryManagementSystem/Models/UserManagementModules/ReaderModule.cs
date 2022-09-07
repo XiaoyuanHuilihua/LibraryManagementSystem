@@ -22,11 +22,11 @@ namespace LibraryManagementSystem.Models.ReaderModule
         }
 
         /// <summary>
-        /// 判断读者是否存在
+        /// 判断readerId读者是否
         /// </summary>
         /// <param name="readerId"></param>
         /// <returns></returns>
-        public Boolean readerCheck(string readerId)
+        public Boolean userCheck(string readerId)
         {
             DataRow status = Sql.Read($"SELECT STATE FROM READER WHERE READER_ID='{readerId}'")[0];
             if (System.Convert.ToBoolean(status[0]))
@@ -40,24 +40,30 @@ namespace LibraryManagementSystem.Models.ReaderModule
         /// <param name="readerIdCard"></param>
         /// <param name="pwd"></param>
         /// <returns></returns>
-        public Boolean readerLogin(string readerIdCard, string pwd)
+        public List<Object> userLogin(string phone, string pwd)
         {
-            DataRow reader = Sql.Read($"SELECT READER_PASSWORD FROM READER WHERE READER_IDCARD={readerIdCard}")[0];
-            if (String.Equals(pwd, reader[0]))
+            List<Object> result = new List<object>();
+            try
             {
-                Sql.Execute($"update reader set STATE=1  WHERE READER_IDCARD={readerIdCard}");
-                return true;
+                DataRow reader = Sql.Read($"SELECT * FROM READER WHERE PHONE_NUMBER='{phone}'")[0];
+                result.Add(reader);
+                if (String.Equals(pwd, reader[2]))
+                {
+                    Sql.Execute($"update reader set STATE=1  WHERE PHONE_NUMBER={phone}");
+                    return result;
+                }
             }
-            return false;
+            catch { }
+            return result;
         }
 
         /// <summary>
         /// 用户推出
         /// </summary>
         /// <param name="readerIdCard"></param>
-        public void readerLogout(string readerIdCard)
+        public void userLogout(string phone)
         {
-            Sql.Execute($"update reader set STATE=0  WHERE READER_IDCARD={readerIdCard}");
+            Sql.Execute($"update reader set STATE=0  WHERE PHONE_NUMBER={phone}");
         }
 
         /// <summary>
@@ -67,7 +73,7 @@ namespace LibraryManagementSystem.Models.ReaderModule
         /// <param name="password"></param>
         /// <param name="phoneNumber"></param>
         /// <param name="readerIdCard"></param>
-        public Boolean readerResister(string readerName, string password, long phoneNumber, string readerIdCard)
+        public Boolean userRegister(string readerName, string password, string phoneNumber, string readerIdCard)
         {
             try
             {
@@ -207,8 +213,13 @@ namespace LibraryManagementSystem.Models.ReaderModule
             Sql.Execute(
                $"INSERT INTO COMMENTS" +
                $"(READER_ID, BOOK_ID, CONTENT, CONTENT_TIME, CONTENT_ID)" +
-               $"VALUES('{readerId}', '{bookId}', '{content}', '{DateTime.Now.ToString("yyyy/MM/dd")}', '{contentId}')"
+               $"VALUES('{readerId}', '{bookId}', '{content}', TO_DATE('{DateTime.Now.ToString("yyyy/MM/dd")}', 'YYYY-MM-DD HH24:MI:SS'), '{contentId}')"
                );
+        }
+
+        public DataRowCollection ViewBooks()
+        {
+            return Sql.Read("SELECT * FROM BOOK");
         }
 
         /// <summary>
@@ -224,13 +235,14 @@ namespace LibraryManagementSystem.Models.ReaderModule
                $"(BOOK_RESERVE_ID, READER_ID, BOOK_ID, BOOK_RESERVE_TIME, BOOK_OVERDUE_TIME)" +
                $"VALUES('{bookReserveId}', " +
                $"'{readerId}', '{bookId}',  " +
-               $"'{DateTime.Now.ToString("yyyy/MM/dd")}', " +
-               $"'{DateTime.Now.AddDays(14).ToString("yyyy/MM/dd")}')");
-            //Sql.Execute(
-            //    $"UPDATE BOOK " +
-            //    $"SET LEND_RESERVE=LEND_RESERVE+1 " +
-            //    $"WHERE BOOK_ID='{bookId}'"
-            //    );
+               $"TO_DATE('{DateTime.Now.ToString("yyyy/MM/dd")}', 'YYYY-MM-DD HH24:MI:SS'), " +
+               $"TO_DATE('{DateTime.Now.AddDays(14).ToString("yyyy/MM/dd")}', 'YYYY-MM-DD HH24:MI:SS'))");
+
+            Sql.Execute(
+                $"UPDATE BOOK " +
+                $"SET LEND_RESERVE=LEND_RESERVE+1 " +
+                $"WHERE BOOK_ID='{bookId}'"
+                );
         }
     }
 }
