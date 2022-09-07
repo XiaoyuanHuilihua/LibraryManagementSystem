@@ -170,7 +170,7 @@ namespace LibraryManagementSystem.Models.ReaderModule
         }
 
         /// <summary>
-        /// 查看座位功能
+        /// 查看所有座位功能
         /// </summary>
         /// <returns></returns>
         public DataRowCollection ViewSeats()

@@ -29,8 +29,17 @@ namespace LibraryManagementSystem.Models.ValueObject
             ReaderIdCard = readerIdCard;
         }
 
-        public Reader()
+        public Reader(
+            string readerId,
+            string readerName,
+            long phoneNumber,
+            string readerIdCard) : base()
         {
+            ReaderId = readerId;
+            ReaderName = readerName;
+            Password = "000000000000";
+            PhoneNumber = phoneNumber;
+            ReaderIdCard = readerIdCard;
         }
 
         /// <summary>

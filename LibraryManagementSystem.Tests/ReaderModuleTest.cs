@@ -22,7 +22,7 @@ namespace LibraryManagementSystem.Tests
         [TestMethod]
         public void 读者借书证办理或读者注册()
         {
-            _ReaderModule.ApplyLibraryCard("李春华", "123456", 15151515555, "4568");
+            _ReaderModule.userRegister("李春华", "123456", 15151515555.ToString(), "4568");
             var reader = _administratorModule.SearchReaderInfo(AdministratorModule.ReaderInfoKind.ReaderName, "李春华")[0];
             Assert.AreEqual("李春华", reader.ReaderName);
             Assert.AreEqual("123456", reader.Password);
@@ -47,7 +47,7 @@ namespace LibraryManagementSystem.Tests
         [TestMethod]
         public void 查看个人信息()
         {
-            _ReaderModule.ApplyLibraryCard("王静", "123456", 15151515555, "sample12345");//readerId = 9
+            _ReaderModule.userRegister("王静", "123456", 15151515555.ToString(), "sample12345");//readerId = 9
             string readerId = "9";
             Console.WriteLine("展示个人信息");
             DataRow reader = _ReaderModule.ViewReaderInformation($"{readerId}");

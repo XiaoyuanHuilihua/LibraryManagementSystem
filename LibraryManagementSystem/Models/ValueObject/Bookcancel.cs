@@ -17,12 +17,13 @@ namespace LibraryManagementSystem.Models.ValueObject
         /// <param name="cancelId">注销编号</param>
         /// <param name="cancelDate">注销日期</param>
         /// <param name="isbn">ISBN</param>
-        public Bookcancel(string bookId, string cancelId, DateTime cancelDate, string isbn)
+        public Bookcancel(string bookId, string cancelId, DateTime cancelDate, string isbn, string reason)
         {
             BookId = bookId;
             CancelId = cancelId;
             CancelDate = cancelDate;
             ISBN = isbn;
+            Reason = reason;
         }
 
         /// <summary>
@@ -44,6 +45,11 @@ namespace LibraryManagementSystem.Models.ValueObject
         /// ISBN
         /// </summary>
         public string ISBN { get; }
+
+        /// <summary>
+        /// 理由
+        /// </summary>
+        public string Reason { get; }
 
         /// <inheritdoc/>
         protected override bool EqualsCore(Bookcancel other)

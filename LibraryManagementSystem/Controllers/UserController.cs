@@ -12,6 +12,21 @@ namespace MvcMovie.Controllers
 {
     public class UserController : Controller
     {
+        /*
+        ----需要的API----
+        读者注册：OK
+        读者登录：OK
+        修改密码功能：OK
+        查看个人信息功能：OK
+        书籍预约功能：OK
+        读者留言功能：OK
+        编辑个人信息功能：
+        查看借阅历史功能：
+        查看当前借阅功能：
+        查看座位功能：
+        预约座位功能：
+        */
+
         private ReaderModule _readerModule = new ReaderModule();
 
         /// <summary>
@@ -63,6 +78,10 @@ namespace MvcMovie.Controllers
             return JsonConvert.SerializeObject(dataReturn);
         }
 
+        /// <summary>
+        /// 查看个人信息的API
+        /// </summary>
+        /// <returns></returns>
         [Route("/user_info")]
         [HttpGet]
         public string viewUserInfo()
@@ -89,6 +108,10 @@ namespace MvcMovie.Controllers
             return JsonConvert.SerializeObject(dataReturn);
         }
 
+        /// <summary>
+        /// 查看所有座位功能的API
+        /// </summary>
+        /// <returns></returns>
         [Route("/view_seats")]
         [HttpGet]
         public string viewSeats()
@@ -117,6 +140,10 @@ namespace MvcMovie.Controllers
             return JsonConvert.SerializeObject(dataReturn);
         }
 
+        /// <summary>
+        /// 预约座位功能的API
+        /// </summary>
+        /// <returns></returns>
         [Route("/reserve_seat")]
         [HttpGet]
         public Boolean reserveSeat()
@@ -132,6 +159,10 @@ namespace MvcMovie.Controllers
             return false;
         }
 
+        /// <summary>
+        /// 查看所有图书的API
+        /// </summary>
+        /// <returns></returns>
         [Route("/user_view_books")]
         [HttpGet]
         public string viewBooks()
@@ -166,6 +197,10 @@ namespace MvcMovie.Controllers
             return JsonConvert.SerializeObject(dataReturn);
         }
 
+        /// <summary>
+        /// 书籍预约功能的API
+        /// </summary>
+        /// <returns></returns>
         [Route("/reserve_book")]
         [HttpPost]
         public string reserveBook()
@@ -185,6 +220,10 @@ namespace MvcMovie.Controllers
             return JsonConvert.SerializeObject(dataReturn);
         }
 
+        /// <summary>
+        /// 读者留言功能的API
+        /// </summary>
+        /// <returns></returns>
         [Route("/user_comment")]
         [HttpPost]
         public string userComment()
@@ -214,6 +253,30 @@ namespace MvcMovie.Controllers
         {
             string phone = HttpContext.Request.Query["phone"];
             _readerModule.userLogout(phone);
+        }
+
+        /// <summary>
+        /// 用户修改密码功能的API
+        /// </summary>
+        /// <returns></returns>
+        [Route("/user_alter_password")]
+        [HttpPost]
+        public string UserAlterPassword()
+        {
+            Dictionary<string, Object> dataReturn = new Dictionary<string, Object>();
+            string readerId = HttpContext.Request.Form["readerId"];
+            string oldPwd = HttpContext.Request.Form["oldpwd"];
+            string newPwd = HttpContext.Request.Form["newpwd"];
+
+            if (_readerModule.userCheck(readerId))
+            {
+                _readerModule.AlterPassword(readerId, oldPwd, newPwd);
+                dataReturn.Add("status", true);
+                return JsonConvert.SerializeObject(dataReturn);
+            }
+
+            dataReturn.Add("status", false);
+            return JsonConvert.SerializeObject(dataReturn);
         }
     }
 }
