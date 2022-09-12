@@ -58,6 +58,19 @@ namespace LibraryManagementSystem.Models.UserManagementModules
         }
 
         /// <summary>
+        /// 判断adminId是否在线
+        /// </summary>
+        /// <param name="adminId"></param>
+        /// <returns></returns>
+        public Boolean AdminCheck(string adminId)
+        {
+            DataRow status = Sql.Read($"SELECT STATE FROM ADMINISTRATOR WHERE ADMIN_ID='{adminId}'")[0];
+            if (System.Convert.ToBoolean(status[0]))
+                return true;
+            return false;
+        }
+
+        /// <summary>
         /// 管理员登录
         /// </summary>
         /// <param name="adminName"></param>
@@ -71,6 +84,15 @@ namespace LibraryManagementSystem.Models.UserManagementModules
                 return true;
             }
             return false;
+        }
+
+        /// <summary>
+        /// 管理员推出
+        /// </summary>
+        /// <param name="readerIdCard"></param>
+        public void AdminLogout(string adminId)
+        {
+            Sql.Execute($"update ADMINISTRATOR set STATE=0  WHERE ADMIN_ID='{adminId}'");
         }
 
         /// <summary>
@@ -254,6 +276,15 @@ namespace LibraryManagementSystem.Models.UserManagementModules
         {
             DataRowCollection readers = Sql.Read($"SELECT READER_ID, READER_NAME, PHONE_NUMBER, READER_IDCARD FROM READER");
             return readers;
+        }
+
+        /// <summary>
+        /// 查看所有帐户信息
+        /// </summary>
+        /// <returns></returns>
+        public DataRowCollection ViewReaders()
+        {
+            return Sql.Read("SELECT * FROM READER");
         }
     }
 }

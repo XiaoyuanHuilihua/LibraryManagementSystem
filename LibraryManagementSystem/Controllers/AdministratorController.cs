@@ -11,15 +11,27 @@ namespace MvcMovie.Controllers
 {
     public class AdministratorController : Controller
     {
+        /*
+        ----需要的API----
+        管理员登录：OK
+        管理员退出：OK
+        搜索帐户(读者)功能：(->搜索所有读者信息OK，用js实现这功能？) OK
+        查看过期未还书的读者名单功能：OK
+        编辑帐户(读者)功能：
+        查看读者借阅历史功能：
+        发送通知功能：
+        编辑座位功能：
+        */
+
         private AdministratorModule _administratorModule = new AdministratorModule();
 
         /// <summary>
-        /// 管理员登录的连接
+        /// 管理员登录的API
         /// </summary>
         /// <returns></returns>
         [Route("/admin_login")]
         [HttpPost]
-        public Boolean readerLogin()
+        public Boolean adminLogin()
         {
             string adminId = HttpContext.Request.Form["adminId"];
             string pwd = HttpContext.Request.Form["pwd"];
@@ -29,7 +41,18 @@ namespace MvcMovie.Controllers
         }
 
         /// <summary>
-        /// 搜索所有用户的连接
+        /// 管理员退出的API
+        /// </summary>
+        [Route("/admin_logout")]
+        [HttpGet]
+        public void userLogout()
+        {
+            string adminId = HttpContext.Request.Query["adminId"];
+            _administratorModule.AdminLogout(adminId);
+        }
+
+        /// <summary>
+        /// 搜索所有用户的API
         /// </summary>
         /// <returns></returns>
         [Route("/views_readers")]
@@ -55,7 +78,7 @@ namespace MvcMovie.Controllers
         }
 
         /// <summary>
-        /// 查看过期未还书的读者名的连接
+        /// 查看过期未还书的读者名的API
         /// </summary>
         /// <returns></returns>
         [Route("/view_unreturned")]
@@ -82,14 +105,9 @@ namespace MvcMovie.Controllers
             return JsonConvert.SerializeObject(dataReturn);
         }
 
-        /*
-        管理员登录：OK
-        搜索帐户(读者)功能：->搜索所有读者信息OK，用js实现这功能？
-        编辑帐户(读者)功能：
-        查看读者借阅历史功能：
-        发送通知功能：
-        查看过期未还书的读者名单功能：OK
-        编辑座位功能：
-        */
+        //编辑帐户(读者)功能：
+        //查看读者借阅历史功能：
+        //发送通知功能：
+        //编辑座位功能：
     }
 }
